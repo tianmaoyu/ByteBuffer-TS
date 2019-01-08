@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "sourceMap": true,
+        "outDir": "./dist", //生成的js和js.map的目录
+    },
+    "include": [ // 需要编译的ts文件一个*表示文件匹配**表示忽略文件的深度问题
+        "./*.ts",
+        "./**/*.ts"
+    ],
+}
