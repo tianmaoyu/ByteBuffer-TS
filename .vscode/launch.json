@@ -1,0 +1,12 @@
+{
+    "version": "2.0.0",
+    "configurations": [{
+        "type": "node",
+        "request": "launch",
+        "name": "启动程序",
+        "program": "${workspaceFolder}/dist/HelloWorld.js", // 需要调试的js代码
+        "outFiles": [
+            "${workspaceFolder}/**/*.js"
+        ]
+    }]
+}
