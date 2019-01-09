@@ -180,7 +180,7 @@ export class StringUtils {
         var length = dataView.getUint8(offset);
         offset += 1;
         var chars = [];
-        for (var i = 0; i < length; i += 2, offset += i) {
+        for (var i = 0; i < length / 2; i++ , offset += 2) {
             chars.push(dataView.getUint16(offset));
         }
         var str = String.fromCharCode.apply(null, chars);

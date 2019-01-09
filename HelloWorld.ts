@@ -5,10 +5,10 @@ import { UserMessage, MessageType } from "./Message";
 //BufferWriteRead.StringTest();
 var msg = new UserMessage();
 msg.MessageType = MessageType.msg1;
-msg.Address = "深";
+msg.Address = "深圳大发好啊%￥……&*（";
 msg.Bool = true;
 msg.Id = 20000;
-msg.Name = "e";
+msg.Name = "稍等哈的身份sdjfhsjdf实得分e";
 var buf = msg.serialize2();
 
 var dv = new Int8Array(buf);
