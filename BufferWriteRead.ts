@@ -49,7 +49,13 @@ export class BufferWriteRead {
     }
 
     public static StringTest() {
-        var buf = UTF8String.str2ab("fdsjfhskdfj$%^&*()扎实的福建省的看法")
+        var buf = UTF8String.str2ab("n你好")
+        console.info(buf.byteLength);
+        var dv = new DataView(buf);
+
+        for (var i = 0; i < dv.byteLength; i++) {
+            console.info(dv.getUint8(i));
+        }
         var str = UTF8String.ab2str(buf);
         console.info(str)
     }

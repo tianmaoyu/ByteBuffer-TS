@@ -10,6 +10,12 @@ var UTF8String = /** @class */ (function () {
     UTF8String.Read = function (buf) {
         return "";
     };
+    /**
+     * 后台 对应的写法
+     * @param string   var bn= BitConverter.GetBytes('n');
+            var b1 = BitConverter.GetBytes('你');
+            var b2 = BitConverter.GetBytes('好');
+     */
     UTF8String.stringToUint8 = function (string) {
         var str = btoa(unescape(encodeURIComponent(string))), charList = str.split(''), uintArray = [];
         for (var i = 0; i < charList.length; i++) {

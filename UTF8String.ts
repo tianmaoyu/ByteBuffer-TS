@@ -9,6 +9,13 @@ export class UTF8String {
         return ""
     }
 
+
+    /**
+     * 后台 对应的写法
+     * @param string   var bn= BitConverter.GetBytes('n');
+            var b1 = BitConverter.GetBytes('你');
+            var b2 = BitConverter.GetBytes('好');
+     */
     public static stringToUint8(string: string): Uint8Array {
         var str = btoa(unescape(encodeURIComponent(string))),
             charList = str.split(''),
