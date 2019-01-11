@@ -1,68 +1,55 @@
-import { Msg } from "./Msg";
-
-
-const Map: { [key: string]: number; } = {};
-
-export class Buffer {
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Map = {};
+var Buffer = /** @class */ (function () {
+    function Buffer() {
+    }
     // public static Wirte(object: Object, buffer: ArrayBuffer, offSet: number, length: number) {
     //     for (var key in object) {
     //         if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
     //             var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", object, key);
     //             return byteInfo;
     //             var dv = new DataView(buffer);
-
     //         }
     //     }
     //     return true;
     // }
-    public static Wirte(object: Object, buffer?: ArrayBuffer | null, offSet?: number | null, length?: number | null) {
-
-        if (object == null) return;
-
+    Buffer.Wirte = function (object, buffer, offSet, length) {
+        if (object == null)
+            return;
         for (var key in object) {
             if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
-                var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", object, key);
+                var byteInfo = Reflect.getMetadata("ByteMember", object, key);
                 return byteInfo;
                 var dv = new DataView(buffer);
-
             }
         }
         return true;
-    }
-
-    public static Read(object: Object, buffer: ArrayBuffer, offSet: number, length: number) {
+    };
+    Buffer.Read = function (object, buffer, offSet, length) {
         for (var key in object) {
             if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
-                var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", object, key);
-
+                var byteInfo = Reflect.getMetadata("ByteMember", object, key);
             }
         }
         return true;
-    }
-
-
-
-    public static GetObjectLength(obj: Object) {
+    };
+    Buffer.GetObjectLength = function (obj) {
         var object_buffer_Length = 0;
         //var isMsg = obj instanceof Msg
         //obj.constructor
         for (var key in obj) {
-            var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
-            if (byteInfo === undefined) continue;
+            var byteInfo = Reflect.getMetadata("ByteMember", obj, key);
+            if (byteInfo === undefined)
+                continue;
             var value_length = this.getLength(byteInfo.Type, obj[key]);
             object_buffer_Length += value_length;
             // console.info(key + ":" + obj[key]);
             // console.info(byteInfo);
-
         }
         return object_buffer_Length;
-    }
-
-
-
-
-    public static getLength(type: ByteType, value: string | object): number {
+    };
+    Buffer.getLength = function (type, value) {
         switch (type) {
             case ByteType.Uint8:
                 return 1;
@@ -79,54 +66,47 @@ export class Buffer {
             case ByteType.Float64:
                 return 8;
             case ByteType.Object:
-                return Buffer.GetObjectLength(value as object)
+                return Buffer.GetObjectLength(value);
             case ByteType.String:
-                return Buffer.getStringLength(value as string)
-
+                return Buffer.getStringLength(value);
         }
-
-    }
-    public static getStringLength(str: string): number {
+    };
+    Buffer.getStringLength = function (str) {
         return str.length * 2 + 1;
-    }
-
-
-}
-
-
-export function ByteMember(order: number, type: ByteType) {
+    };
+    return Buffer;
+}());
+exports.Buffer = Buffer;
+function ByteMember(order, type) {
     return Reflect.metadata("ByteMember", new ByteInfo(order, type));
 }
-
-export class ByteInfo {
-    public Order: number;
-    public Type: ByteType;
-    constructor(order: number, type: ByteType) {
+exports.ByteMember = ByteMember;
+var ByteInfo = /** @class */ (function () {
+    function ByteInfo(order, type) {
         this.Order = order;
         this.Type = type;
     }
-}
-
-export enum ByteType {
-    Int8 = 1,
-    Uint8 = 2,
-    Int16 = 3,
-    Uint16 = 4,
-    Int32 = 5,
-    Uint32 = 6,
-    Float32 = 7,
-    Float64 = 8,
-    String = 9,
-    Object = 10,
-}
-
-
+    return ByteInfo;
+}());
+exports.ByteInfo = ByteInfo;
+var ByteType;
+(function (ByteType) {
+    ByteType[ByteType["Int8"] = 1] = "Int8";
+    ByteType[ByteType["Uint8"] = 2] = "Uint8";
+    ByteType[ByteType["Int16"] = 3] = "Int16";
+    ByteType[ByteType["Uint16"] = 4] = "Uint16";
+    ByteType[ByteType["Int32"] = 5] = "Int32";
+    ByteType[ByteType["Uint32"] = 6] = "Uint32";
+    ByteType[ByteType["Float32"] = 7] = "Float32";
+    ByteType[ByteType["Float64"] = 8] = "Float64";
+    ByteType[ByteType["String"] = 9] = "String";
+    ByteType[ByteType["Object"] = 10] = "Object";
+})(ByteType = exports.ByteType || (exports.ByteType = {}));
 // export interface IByteOptions {
 //     Order: number;
 //     Type: ByteType;
 // }
 // export class ByteWrite {
-
 //     public static Valid(object: Object) {
 //         for (var key in object) {
 //             if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
@@ -140,7 +120,6 @@ export enum ByteType {
 //         return true;
 //     }
 // }
-
 // export interface IByteOptions {
 //     Order: number;
 //     Type: ByteType;
@@ -151,45 +130,35 @@ export enum ByteType {
 //     MinLength?: number;
 //     MaxLength?: number;
 // }
-
 // export interface INumberOptions {
 //     Min?: number;
 //     Max?: number;
 // }
-
 // export interface ITimeValidationOptions {
 //     Format: string;
 //     Locale?: string;
 // }
-
 // export class Validation {
-
 //     private static _validationRules: any = {
 //         Number: (value: number, options: INumberOptions) => {
 //             if (typeof value !== "number")
 //                 return false;
-
 //             if (options.Max !== undefined && options.Min !== undefined)
 //                 return value < options.Max && value > options.Min;
-
 //             return (options.Max !== undefined && value < options.Max) ||
 //                 (options.Min !== undefined && value > options.Min);
 //         },
 //         String: (value: string, options: IStringOptions) => {
 //             if (typeof value !== "string")
 //                 return false;
-
 //             if (options.MaxLength !== undefined && options.MinLength !== undefined)
 //                 return value.length < options.MaxLength && value.length > options.MinLength;
-
 //             return (options.MaxLength !== undefined && value.length < options.MaxLength) ||
 //                 (options.MinLength !== undefined && value.length > options.MinLength);
 //         },
 //     };
-
 //     constructor(private _options: IByteOptions) {
 //     }
-
 //     Validate(value: any): boolean {
 //         for (var key in this._options) {
 //             if (Validation._validationRules[key](value, this._options[key]) === false) {
@@ -199,3 +168,4 @@ export enum ByteType {
 //         return true;
 //     }
 // }
+//# sourceMappingURL=ByteInfo.js.map

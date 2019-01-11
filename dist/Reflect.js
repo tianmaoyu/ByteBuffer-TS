@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
-function format(formatString) {
+function format(formatString, len) {
     return Reflect.metadata("format", formatString);
 }
 exports.format = format;

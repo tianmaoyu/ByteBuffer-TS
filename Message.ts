@@ -1,13 +1,12 @@
 import { format } from "./Reflect";
 import { UTF8String } from "./UTF8String";
+import { ByteMember, ByteType } from "./ByteInfo";
 
 
 
 
 export class UserMessage {
-
     public MessageType: MessageType = MessageType.msg1;
-
 
     public Id: number;//2
 

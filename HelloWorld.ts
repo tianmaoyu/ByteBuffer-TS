@@ -1,6 +1,41 @@
 import { BufferWriteRead } from "./BufferWriteRead";
 import { UserMessage, MessageType } from "./Message";
 import { getFormat } from "./Reflect";
+import { Msg, User } from "./Msg";
+import { Buffer } from './ByteInfo';
+
+
+var msg1 = new Msg();
+msg1.MessageType = MessageType.msg1;
+msg1.Address = "深圳";
+msg1.Bool = false;
+msg1.Name = "eric";
+msg1.Id = 1000;
+var user = new User();
+user.Id = 2;
+user.Name = "张三"
+msg1.User = user;
+var bufferLength = Buffer.GetObjectLength(msg1);
+console.info(bufferLength);
+
+Buffer.Wirte(msg1)
+var type = typeof msg1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //BufferWriteRead.StringTest();
