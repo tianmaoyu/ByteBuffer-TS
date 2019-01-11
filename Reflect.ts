@@ -2,7 +2,7 @@ import "reflect-metadata";
 
 
 
-export function format(formatString: string) {
+export function format(formatString: string, len: number) {
     return Reflect.metadata("format", formatString);
 }
 
