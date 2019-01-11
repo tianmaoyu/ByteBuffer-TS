@@ -15,6 +15,7 @@ export class UserMessage {
 
     public Name: string;//16
 
+    @format("1", 16)
     public Address: string;//16
 
 

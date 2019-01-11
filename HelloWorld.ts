@@ -1,5 +1,6 @@
 import { BufferWriteRead } from "./BufferWriteRead";
 import { UserMessage, MessageType } from "./Message";
+import { getFormat } from "./Reflect";
 
 
 //BufferWriteRead.StringTest();
@@ -17,7 +18,7 @@ dv.forEach(i => console.info(i));
 console.info(buf.byteLength);
 var _msg = UserMessage.deserialize(buf);
 console.info(_msg);
-
+var addressFormate = getFormat(msg, "Address")
 // export class Startup {
 //   public static main(): number {
 //     console.log("Hello World");
