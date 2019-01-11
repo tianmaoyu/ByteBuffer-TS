@@ -28,3 +28,25 @@ export class User {
     @ByteMember(2, ByteType.String)
     public Name: String;
 }
+
+
+export class List<T> extends Array {
+
+}
+
+export class Int8 extends Number {
+
+}
+
+
+export class UInt8 extends Number {
+
+}
+
+export class Int16 extends Number {
+
+}
+
+export class UInt16 extends Number {
+
+}

@@ -36,16 +36,12 @@ var Buffer = /** @class */ (function () {
     };
     Buffer.GetObjectLength = function (obj) {
         var object_buffer_Length = 0;
-        //var isMsg = obj instanceof Msg
-        //obj.constructor
         for (var key in obj) {
             var byteInfo = Reflect.getMetadata("ByteMember", obj, key);
             if (byteInfo === undefined)
                 continue;
             var value_length = this.getLength(byteInfo.Type, obj[key]);
             object_buffer_Length += value_length;
-            // console.info(key + ":" + obj[key]);
-            // console.info(byteInfo);
         }
         return object_buffer_Length;
     };

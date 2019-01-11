@@ -1,10 +1,24 @@
 import { BufferWriteRead } from "./BufferWriteRead";
 import { UserMessage, MessageType } from "./Message";
 import { getFormat } from "./Reflect";
-import { Msg, User } from "./Msg";
+import { Msg, User, Int16, List } from './Msg';
 import { Buffer } from './ByteInfo';
 
+var listInt16 = new List<Int16>();
+listInt16.push(1);
+listInt16.push(100);
 
+var isListInt16 = listInt16 instanceof Array;
+var int16 = listInt16[0];
+//var isInt16 = (typeof int16 == "Int16");
+
+var list = [];
+list.push(new Msg());
+list.push(new Msg());
+var listype = list instanceof Array;
+console.info(list);
+var item = list[0] instanceof Msg;
+console.info(item);
 var msg1 = new Msg();
 msg1.MessageType = MessageType.msg1;
 msg1.Address = "深圳";
