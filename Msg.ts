@@ -19,6 +19,13 @@ export class Msg {
 
     @ByteMember(6, ByteType.Object)
     public User: User;
+
+    @ByteMember(7, ByteType.UInt8Array)
+    public IdList: number[] = [];
+
+    @ByteMember(6, ByteType.ObjectArray)
+    public UserList: User[];
+
 }
 
 
@@ -29,24 +36,3 @@ export class User {
     public Name: String;
 }
 
-
-export class List<T> extends Array {
-
-}
-
-export class Int8 extends Number {
-
-}
-
-
-export class UInt8 extends Number {
-
-}
-
-export class Int16 extends Number {
-
-}
-
-export class UInt16 extends Number {
-
-}

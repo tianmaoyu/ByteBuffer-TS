@@ -43,24 +43,32 @@ export class Buffer {
 
 
 
+    /**
+     * 得到 object 对象 二进制 长度
+     * @param obj 
+     */
     public static GetObjectLength(obj: Object) {
-        var object_buffer_Length = 0;
-
+        var objectLength = 0;
+        if (obj === null || obj === undefined) {
+            return objectLength;
+        }
         for (var key in obj) {
             var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
             if (byteInfo === undefined) continue;
-            var value_length = this.getLength(byteInfo.Type, obj[key]);
-            object_buffer_Length += value_length;
-
-
+            var propertyLength = this.getPropertyLength(byteInfo.Type, obj[key]);
+            objectLength += propertyLength;
         }
-        return object_buffer_Length;
+        return objectLength;
     }
 
 
 
-
-    public static getLength(type: ByteType, value: string | object): number {
+    /**
+     * 得到 属性 二进制 长度
+     * @param type 
+     * @param value 
+     */
+    private static getPropertyLength(type: ByteType, value: string | object | []): number {
         switch (type) {
             case ByteType.Uint8:
                 return 1;
@@ -79,23 +87,66 @@ export class Buffer {
             case ByteType.Object:
                 return Buffer.GetObjectLength(value as object)
             case ByteType.String:
-                return Buffer.getStringLength(value as string)
+                return Buffer.getStringLength(value as string);
 
+            //数组
+            case ByteType.UInt8Array:
+                return 1 * (value as Array<number>).length;
+            case ByteType.Int8Array:
+                return 1 * (value as Array<number>).length;
+            case ByteType.Uint16Array:
+                return 2 * (value as Array<number>).length;
+            case ByteType.Int16Array:
+                return 2 * (value as Array<number>).length;
+            case ByteType.Int32Array:
+                return 4 * (value as Array<number>).length;
+            case ByteType.Float32Array:
+                return 4 * (value as Array<number>).length;
+            case ByteType.Float64Array:
+                return 8 * (value as Array<number>).length;
+
+            case ByteType.ObjectArray:
+                return Buffer.getObjectArrayLength(value as Array<object>)
+            case ByteType.StringArray:
+                return Buffer.getStringArrayLength(value as Array<string>)
         }
 
     }
-    public static getStringLength(str: string): number {
-        return str.length * 2 + 1;
+
+    private static getStringLength(str: string): number {
+        return str.length * 2 + 1;// 长度的 2 倍 ， 并用一位标识 长度
     }
 
+    private static getStringArrayLength(strArray: Array<string>): number {
+        var length = 0
+        for (var i = 0; i < strArray.length; i++) {
+            length += this.getStringLength(strArray[i]);
+        }
+        return length;
+    }
+
+    private static getObjectArrayLength(objArray: Array<object>) {
+        var length = 0;
+        for (var i = 0; i < objArray.length; i++) {
+            length += this.GetObjectLength(objArray[i]);
+        }
+        return length;
+    }
 
 }
 
-
+/**
+ * ByteMember 装饰器
+ * @param order 
+ * @param type 
+ */
 export function ByteMember(order: number, type: ByteType) {
     return Reflect.metadata("ByteMember", new ByteInfo(order, type));
 }
 
+/**
+ * 要写入的 byte 类型
+ */
 export class ByteInfo {
     public Order: number;
     public Type: ByteType;
@@ -105,6 +156,9 @@ export class ByteInfo {
     }
 }
 
+/**
+ *Byte Type 枚举类型
+ */
 export enum ByteType {
     Int8 = 1,
     Uint8 = 2,
@@ -116,6 +170,18 @@ export enum ByteType {
     Float64 = 8,
     String = 9,
     Object = 10,
+
+    //数组
+    Int8Array = 10,
+    UInt8Array = 11,
+    Int16Array = 13,
+    Uint16Array = 14,
+    Int32Array = 15,
+    Uint32Array = 16,
+    Float32Array = 17,
+    Float64Array = 18,
+    StringArray = 19,
+    ObjectArray = 20,
 }
 
 

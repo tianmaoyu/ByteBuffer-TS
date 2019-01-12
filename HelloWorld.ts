@@ -1,24 +1,18 @@
 import { BufferWriteRead } from "./BufferWriteRead";
 import { UserMessage, MessageType } from "./Message";
 import { getFormat } from "./Reflect";
-import { Msg, User, Int16, List } from './Msg';
+import { Msg, User } from './Msg';
 import { Buffer } from './ByteInfo';
 
-var listInt16 = new List<Int16>();
-listInt16.push(1);
-listInt16.push(100);
 
-var isListInt16 = listInt16 instanceof Array;
-var int16 = listInt16[0];
-//var isInt16 = (typeof int16 == "Int16");
 
-var list = [];
-list.push(new Msg());
-list.push(new Msg());
-var listype = list instanceof Array;
-console.info(list);
-var item = list[0] instanceof Msg;
-console.info(item);
+// var list = [];
+// list.push(new Msg());
+// list.push(new Msg());
+// var listype = list instanceof Array;
+// console.info(list);
+// var item = list[0] instanceof Msg;
+// console.info(item);
 var msg1 = new Msg();
 msg1.MessageType = MessageType.msg1;
 msg1.Address = "深圳";
@@ -29,11 +23,18 @@ var user = new User();
 user.Id = 2;
 user.Name = "张三"
 msg1.User = user;
+var listUser = [new User(), new User()];
+msg1.UserList = listUser;
+var idList = [1, 2, 3, 4, 5];
+
+msg1.IdList = idList;
+
 var bufferLength = Buffer.GetObjectLength(msg1);
-console.info(bufferLength);
+
 
 Buffer.Wirte(msg1)
-var type = typeof msg1;
+console.info(bufferLength);
+
 
 
 
