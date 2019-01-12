@@ -2,9 +2,43 @@ import { BufferWriteRead } from "./BufferWriteRead";
 import { UserMessage, MessageType } from "./Message";
 import { getFormat } from "./Reflect";
 import { Msg, User } from './Msg';
-import { Buffer } from './ByteInfo';
+import { Buffer, Instance } from './ByteInfo';
 
+var msg = new Msg();
+msg.MessageType = MessageType.msg1;
+msg.Address = "深圳";
+msg.Bool = false;
+msg.Name = "eric";
+msg.Id = 1000;
 
+var buffer = Buffer.WirteObject(msg);
+console.info(buffer.byteLength);
+
+var msg1 = Buffer.ReadObject(Msg, buffer);
+console.info(msg1);
+//反射
+class Team {
+    // constructor(name: string, age: number) {
+    //     this.name = name;
+    //     this.age = age;
+    // }
+    public name: string = "1 team";
+    public age: number;
+}
+
+function create<T>(constructor: any, ...parms: any): T {
+    return new constructor(...parms);
+}
+console.info(Team);
+var classType: Function[] = [];
+classType.push(Team);
+console.info(classType[0]);
+
+// var t1 = create(Team, "eric", 18);
+// var t2 = new Team();
+// console.info(t2)
+// console.info(t1);
+// t2.constructor
 
 // var list = [];
 // list.push(new Msg());
@@ -13,6 +47,10 @@ import { Buffer } from './ByteInfo';
 // console.info(list);
 // var item = list[0] instanceof Msg;
 // console.info(item);
+
+
+
+
 var msg1 = new Msg();
 msg1.MessageType = MessageType.msg1;
 msg1.Address = "深圳";
@@ -32,15 +70,13 @@ msg1.IdList = idList;
 var bufferLength = Buffer.GetObjectLength(msg1);
 
 
-Buffer.Wirte(msg1)
-console.info(bufferLength);
+// Buffer.Wirte(msg1)
+// console.info(bufferLength);
 
 
 
-
-
-
-
+var buf1 = new ArrayBuffer(10);
+var buf2 = new ArrayBuffer(10);
 
 
 

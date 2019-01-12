@@ -11,10 +11,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Message_1 = require("./Message");
 var ByteInfo_1 = require("./ByteInfo");
+/**
+ * 实体需要一个初始值，反射使用
+ */
 var Msg = /** @class */ (function () {
     function Msg() {
         this.MessageType = Message_1.MessageType.msg1;
-        this.IdList = [];
+        this.Id = 0;
+        this.Bool = false;
+        this.Name = "";
+        this.Address = "";
+        // @ByteMember(6, ByteType.Object)
+        // public User: User;
+        // @ByteMember(7, ByteType.UInt8Array)
+        // public IdList: number[] = [];
+        // @ByteMember(6, ByteType.ObjectArray)
+        // public UserList: User[];
     }
     __decorate([
         ByteInfo_1.ByteMember(1, ByteInfo_1.ByteType.Uint8),
@@ -36,18 +48,6 @@ var Msg = /** @class */ (function () {
         ByteInfo_1.ByteMember(5, ByteInfo_1.ByteType.String),
         __metadata("design:type", String)
     ], Msg.prototype, "Address", void 0);
-    __decorate([
-        ByteInfo_1.ByteMember(6, ByteInfo_1.ByteType.Object),
-        __metadata("design:type", User)
-    ], Msg.prototype, "User", void 0);
-    __decorate([
-        ByteInfo_1.ByteMember(7, ByteInfo_1.ByteType.UInt8Array),
-        __metadata("design:type", Array)
-    ], Msg.prototype, "IdList", void 0);
-    __decorate([
-        ByteInfo_1.ByteMember(6, ByteInfo_1.ByteType.ObjectArray),
-        __metadata("design:type", Array)
-    ], Msg.prototype, "UserList", void 0);
     return Msg;
 }());
 exports.Msg = Msg;

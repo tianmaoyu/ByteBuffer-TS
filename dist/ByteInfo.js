@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Map = {};
+var classPool = [];
 var Buffer = /** @class */ (function () {
     function Buffer() {
     }
@@ -14,26 +15,188 @@ var Buffer = /** @class */ (function () {
     //     }
     //     return true;
     // }
-    Buffer.Wirte = function (object, buffer, offSet, length) {
-        if (object == null)
-            return;
-        for (var key in object) {
-            if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
-                var byteInfo = Reflect.getMetadata("ByteMember", object, key);
-                return byteInfo;
-                var dv = new DataView(buffer);
-            }
+    // public static Wirte(object: Object, buffer?: ArrayBuffer | null, offSet?: number | null, length?: number | null) {
+    //     if (object == null) return;
+    //     for (var key in object) {
+    //         if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
+    //             var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", object, key);
+    //             return byteInfo;
+    //             var dv = new DataView(buffer);
+    //         }
+    //     }
+    //     return true;
+    // }
+    // public static Read(object: Object, buffer: ArrayBuffer, offSet: number, length: number) {
+    //     for (var key in object) {
+    //         if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
+    //             var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", object, key);
+    //         }
+    //     }
+    //     return true;
+    // }
+    //#region  写入 
+    // public static WirteObject(obj: Object, buffer?: ArrayBuffer | null, offSet?: number | null, length?: number | null) {
+    //     var offSet = 0;
+    //     var objectBuffer = new ArrayBuffer(128);
+    //     var dataView = new DataView(objectBuffer);
+    //     for (var key in obj) {
+    //         var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
+    //         if (byteInfo === undefined) continue;
+    //         var propertyLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[key]);
+    //         offSet += propertyLength;
+    //     }
+    //     return offSet;
+    // }
+    /**
+     * 从 buffer 中反射 出 一个 classType 实例
+     * @param classType
+     * @param buffer
+     */
+    Buffer.ReadObject = function (classType, buffer) {
+        var offSet = 0;
+        var object = new classType();
+        var dataView = new DataView(buffer);
+        for (var propertyKey in object) {
+            var byteInfo = Reflect.getMetadata("ByteMember", object, propertyKey);
+            if (byteInfo === undefined)
+                continue;
+            var propertyLength = this.readProperty(dataView, offSet, byteInfo.Type, object, propertyKey);
+            offSet += propertyLength;
         }
-        return true;
+        // for (var info in byteInfos){
+        // }
+        return object;
     };
-    Buffer.Read = function (object, buffer, offSet, length) {
-        for (var key in object) {
-            if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
-                var byteInfo = Reflect.getMetadata("ByteMember", object, key);
-            }
+    Buffer.readProperty = function (dataView, offSet, type, object, propertyKey) {
+        switch (type) {
+            case ByteType.Uint8:
+                object[propertyKey] = dataView.getUint8(offSet);
+                return 1;
+            case ByteType.Int8:
+                object[propertyKey] = dataView.getInt8(offSet);
+                return 1;
+            case ByteType.Uint16:
+                object[propertyKey] = dataView.getUint16(offSet);
+                return 2;
+            case ByteType.Int16:
+                object[propertyKey] = dataView.getInt16(offSet);
+                return 2;
+            case ByteType.Int32:
+                object[propertyKey] = dataView.getInt32(offSet);
+                return 4;
+            case ByteType.Float32:
+                object[propertyKey] = dataView.getFloat32(offSet);
+                return 4;
+            case ByteType.Float64:
+                object[propertyKey] = dataView.getFloat64(offSet);
+                return 8;
+            case ByteType.String:
+                return Buffer.readString(dataView, offSet, object, propertyKey);
         }
-        return true;
     };
+    /**
+      * 从buf 中读取 string
+      * @param buf
+      * @param offset 开始
+      * @param length 长度
+      */
+    Buffer.readString = function (dataView, offset, object, propertyKey) {
+        var length = dataView.getUint8(offset);
+        offset += 1;
+        var chars = [];
+        for (var i = 0; i < length / 2; i++, offset += 2) {
+            chars.push(dataView.getUint16(offset));
+        }
+        var str = String.fromCharCode.apply(null, chars);
+        object[propertyKey] = str;
+        return length + 1;
+    };
+    Buffer.WirteObject = function (obj) {
+        var offSet = 0;
+        var catheBuffer = new ArrayBuffer(128);
+        var dataView = new DataView(catheBuffer);
+        for (var key in obj) {
+            var byteInfo = Reflect.getMetadata("ByteMember", obj, key);
+            if (byteInfo === undefined)
+                continue;
+            var propertyLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[key]);
+            offSet += propertyLength;
+        }
+        var buffer = catheBuffer.slice(0, offSet);
+        return buffer;
+    };
+    /**
+    * 把属性 Property 写入 二进制，并返回写入了的长度
+    * @param type
+    * @param value
+    */
+    Buffer.writeProperty = function (dataView, offSet, type, value) {
+        switch (type) {
+            case ByteType.Uint8:
+                dataView.setUint8(offSet, value);
+                return 1;
+            case ByteType.Int8:
+                dataView.setInt8(offSet, value);
+                return 1;
+            case ByteType.Uint16:
+                dataView.setUint16(offSet, value);
+                return 2;
+            case ByteType.Int16:
+                dataView.setInt16(offSet, value);
+                return 2;
+            case ByteType.Int32:
+                dataView.setInt32(offSet, value);
+                return 4;
+            case ByteType.Float32:
+                dataView.setFloat32(offSet, value);
+                return 4;
+            case ByteType.Float64:
+                dataView.setFloat64(offSet, value);
+                return 8;
+            // case ByteType.Object:
+            //     return Buffer.GetObjectLength(value as object)
+            case ByteType.String:
+                return Buffer.writeString(dataView, offSet, value);
+            // //数组
+            // case ByteType.UInt8Array:
+            //     return 1 * (value as Array<number>).length;
+            // case ByteType.Int8Array:
+            //     return 1 * (value as Array<number>).length;
+            // case ByteType.Uint16Array:
+            //     return 2 * (value as Array<number>).length;
+            // case ByteType.Int16Array:
+            //     return 2 * (value as Array<number>).length;
+            // case ByteType.Int32Array:
+            //     return 4 * (value as Array<number>).length;
+            // case ByteType.Float32Array:
+            //     return 4 * (value as Array<number>).length;
+            // case ByteType.Float64Array:
+            //     return 8 * (value as Array<number>).length;
+            // case ByteType.ObjectArray:
+            //     return Buffer.getObjectArrayLength(value as Array<object>)
+            // case ByteType.StringArray:
+            //     return Buffer.getStringArrayLength(value as Array<string>)
+        }
+    };
+    /**
+     * 把一个字符串 写入到 dv 中，并返回 长度 【2*length+1】
+     * 每个字符占用2个字节
+     * 第一个位 写入 字符串的长度
+     * @param dataView
+     * @param offset
+     * @param str
+     */
+    Buffer.writeString = function (dataView, offset, str) {
+        var length = str.length * 2; // 2个字节
+        dataView.setUint8(offset, length); // 1 字节写入长度
+        offset++;
+        for (var i = 0; i < str.length; i++, offset += 2) {
+            dataView.setUint16(offset, str.charCodeAt(i));
+        }
+        return length + 1;
+    };
+    //#endregion
+    //#region  长度  计算
     /**
      * 得到 object 对象 二进制 长度
      * @param obj
@@ -165,6 +328,11 @@ var ByteType;
     ByteType[ByteType["StringArray"] = 19] = "StringArray";
     ByteType[ByteType["ObjectArray"] = 20] = "ObjectArray";
 })(ByteType = exports.ByteType || (exports.ByteType = {}));
+//反射对象 https://zhuanlan.zhihu.com/p/22962797
+function Instance(_constructor) {
+    return new _constructor;
+}
+exports.Instance = Instance;
 // export interface IByteOptions {
 //     Order: number;
 //     Type: ByteType;
