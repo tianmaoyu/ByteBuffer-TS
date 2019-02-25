@@ -12,7 +12,7 @@ const ClassPool: { [key: string]: any; } = {};
 ClassPool["Msg"] = Msg;
 var _obj =new ClassPool["Msg"]();
 
-var msg = new Msg();
+var msg = new Msg();//sss
 msg.MessageType = MessageType.msg1;
 msg.Address = "深圳";
 msg.Bool = false;
