@@ -31,7 +31,6 @@ function enumerable(value: boolean) {
 }
 
 ////装饰器参看 http://blog.wolksoftware.com/decorators-metadata-reflection-in-typescript-from-novice-to-expert-part-ii
-
 function log(target: Function, key: string, value: any) {
     return {
         value: function (...args: any[]) {
@@ -45,59 +44,61 @@ function log(target: Function, key: string, value: any) {
 }
 
 
-function logProperty(target: any, key: string) {
-    // property value
-    var _val = this[key];
-    // property getter
-    var getter = function () {
-        console.log(`Get: ${key} => ${_val}`);
-        return _val;
-    };
-    // property setter
-    var setter = function (newVal) {
-        console.log(`Set: ${key} => ${newVal}`);
-        _val = newVal;
-    };
-    // Delete property.
-    if (delete this[key]) {
-        // Create new property with getter and setter
-        Object.defineProperty(target, key, {
-            get: getter,
-            set: setter,
-            enumerable: true,
-            configurable: true
-        });
-    }
+export function logProperty(target: any, key: string) {
+    console.info("反射:"+key)
+    console.info(target)
+    // // property value
+    // var _val = this[key];
+    // // property getter
+    // var getter = function () {
+    //     console.log(`Get: ${key} => ${_val}`);
+    //     return _val;
+    // };
+    // // property setter
+    // var setter = function (newVal) {
+    //     console.log(`Set: ${key} => ${newVal}`);
+    //     _val = newVal;
+    // };
+    // // Delete property.
+    // if (delete this[key]) {
+    //     // Create new property with getter and setter
+    //     Object.defineProperty(target, key, {
+    //         get: getter,
+    //         set: setter,
+    //         enumerable: true,
+    //         configurable: true
+    //     });
+    // }
 }
 
-function logClass(target: any) {
+export function logClass(target: any) {
+     console.info(target);
+    // // save a reference to the original constructor
+    // var original = target;
+    
+    // // a utility function to generate instances of a class
+    // function construct(constructor, args) {
+    //     var c: any = function () {
+    //         return constructor.apply(this, args);
+    //     }
+    //     c.prototype = constructor.prototype;
+    //     return new c();
+    // }
 
-    // save a reference to the original constructor
-    var original = target;
+    // // the new constructor behaviour
+    // var f: any = function (...args) {
+    //     console.log("New: " + original.name);
+    //     return construct(original, args);
+    // }
 
-    // a utility function to generate instances of a class
-    function construct(constructor, args) {
-        var c: any = function () {
-            return constructor.apply(this, args);
-        }
-        c.prototype = constructor.prototype;
-        return new c();
-    }
+    // // copy prototype so intanceof operator still works
+    // f.prototype = original.prototype;
 
-    // the new constructor behaviour
-    var f: any = function (...args) {
-        console.log("New: " + original.name);
-        return construct(original, args);
-    }
-
-    // copy prototype so intanceof operator still works
-    f.prototype = original.prototype;
-
-    // return new constructor (will override original)
-    return f;
+    // // return new constructor (will override original)
+    // return f;
 }
 
-function logParameter(target: any, key: string, index: number) {
+export function logParameter(target: any, key: string, index: number) {
     var metadataKey = `log_${key}_parameters`;
     if (Array.isArray(target[metadataKey])) {
         target[metadataKey].push(index);

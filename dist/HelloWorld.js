@@ -9,47 +9,54 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Message_1 = require("./Message");
-var Reflect_1 = require("./Reflect");
-var Msg_1 = require("./Msg");
-var ByteInfo_1 = require("./ByteInfo");
-var MsgPool = {};
-var ClassPool = {};
+var Team_1;
+const Message_1 = require("./Message");
+const Msg_1 = require("./Msg");
+const ByteInfo_1 = require("./ByteInfo");
+var role = new Msg_1.Role();
+const MsgPool = {};
+const ClassPool = {};
 ClassPool["Msg"] = Msg_1.Msg;
 var _obj = new ClassPool["Msg"]();
-var msg = new Msg_1.Msg();
+var msg = new Msg_1.Msg(); //sss
 msg.MessageType = Message_1.MessageType.msg1;
-msg.Address = "深圳";
-msg.Bool = false;
-msg.Name = "eric";
-msg.Id = 1000;
+// msg.Address = "深圳";
+// msg.Bool = false;
+// msg.Name = "eric";
+// msg.Id = 1000;
+// var role=new Role();
+// role.Id=1;
+// role.Name="admin";
+var user = new Msg_1.User();
+user.Id = 1;
+user.Name = "user";
+msg.User = user;
+var user2 = new Msg_1.User();
+user2.Id = 2;
+user2.Name = "user2";
+msg.UserList = [];
+msg.UserList.push(user2);
 var buffer = ByteInfo_1.Buffer.WirteObject(msg);
 console.info(buffer.byteLength);
 var msg1 = ByteInfo_1.Buffer.ReadObject(Msg_1.Msg, buffer);
 console.info(msg1);
 //反射
-var Team = /** @class */ (function () {
-    function Team(name, age) {
+let Team = Team_1 = class Team {
+    constructor(name, age) {
         this.name = name;
         this.age = age;
     }
-    Team_1 = Team;
-    var Team_1;
-    Team = Team_1 = __decorate([
-        Reflect.metadata("ClassType", Team_1),
-        __metadata("design:paramtypes", [String, Number])
-    ], Team);
-    return Team;
-}());
-function create(constructor) {
-    var parms = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        parms[_i - 1] = arguments[_i];
-    }
-    return new (constructor.bind.apply(constructor, [void 0].concat(parms)))();
+};
+Team = Team_1 = __decorate([
+    Reflect.metadata("ClassType", Team_1),
+    __metadata("design:paramtypes", [String, Number])
+], Team);
+function create(constructor, ...parms) {
+    return new constructor(...parms);
 }
 console.info(Team);
 var classType = [];
+console.info(classType);
 classType.push(Team);
 console.info(classType[0]);
 var t1 = create(Team, "eric", 18);
@@ -90,19 +97,19 @@ var bufferLength = ByteInfo_1.Buffer.GetObjectLength(msg1);
 var buf1 = new ArrayBuffer(10);
 var buf2 = new ArrayBuffer(10);
 //BufferWriteRead.StringTest();
-var msg2 = new Message_1.UserMessage();
-msg2.MessageType = Message_1.MessageType.msg1;
-msg2.Address = "深圳大发好啊%￥……&*（";
-msg2.Bool = true;
-msg2.Id = 20000;
-msg2.Name = "稍等哈的身份sdjfhsjdf实得分e";
-var buf = msg2.serialize2();
-var dv = new Int8Array(buf);
-dv.forEach(function (i) { return console.info(i); });
-console.info(buf.byteLength);
-var _msg = Message_1.UserMessage.deserialize(buf);
-console.info(_msg);
-var addressFormate = Reflect_1.getFormat(msg, "Address");
+// var msg2 = new UserMessage();
+// msg2.MessageType = MessageType.msg1;
+// msg2.Address = "深圳大发好啊%￥……&*（";
+// msg2.Bool = true;
+// msg2.Id = 20000;
+// msg2.Name = "稍等哈的身份sdjfhsjdf实得分e";
+// var buf = msg2.serialize2();
+// var dv = new Int8Array(buf);
+// dv.forEach(i => console.info(i));
+// console.info(buf.byteLength);
+// var _msg = UserMessage.deserialize(buf);
+// console.info(_msg);
+// var addressFormate = getFormat(msg, "Address")
 // export class Startup {
 //   public static main(): number {
 //     console.log("Hello World");

@@ -9,9 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Reflect_1 = require("./Reflect");
-var UserMessage = /** @class */ (function () {
-    function UserMessage() {
+const Reflect_1 = require("./Reflect");
+class UserMessage {
+    constructor() {
         this.MessageType = MessageType.msg1;
     }
     // public serialize(): ArrayBuffer {
@@ -30,7 +30,7 @@ var UserMessage = /** @class */ (function () {
     //     offSet += addressLength;
     //     return buf;
     // }
-    UserMessage.deserialize = function (buf) {
+    static deserialize(buf) {
         var msg = new UserMessage();
         var offSet = 0;
         var dataView = new DataView(buf);
@@ -46,8 +46,8 @@ var UserMessage = /** @class */ (function () {
         var lenStr = StringUtils.getString2(dataView, offSet);
         msg.Address = lenStr.text;
         return msg;
-    };
-    UserMessage.prototype.serialize2 = function () {
+    }
+    serialize2() {
         var length = 1 + 2 + 1 + this.Name.length * 2 + 1 + this.Address.length * 2 + 1;
         var buf = new ArrayBuffer(length);
         var dataView = new DataView(buf);
@@ -66,60 +66,54 @@ var UserMessage = /** @class */ (function () {
         var addressLength = StringUtils.writeString2(dataView, offSet, this.Address);
         offSet += addressLength;
         return buf;
-    };
-    __decorate([
-        Reflect_1.format("1", 16),
-        __metadata("design:type", String)
-    ], UserMessage.prototype, "Address", void 0);
-    return UserMessage;
-}());
+    }
+}
+__decorate([
+    Reflect_1.format("1", 16),
+    __metadata("design:type", String)
+], UserMessage.prototype, "Address", void 0);
 exports.UserMessage = UserMessage;
 var MessageType;
 (function (MessageType) {
     MessageType[MessageType["msg1"] = 1] = "msg1";
     MessageType[MessageType["msg2"] = 2] = "msg2";
 })(MessageType = exports.MessageType || (exports.MessageType = {}));
-var MessageBase = /** @class */ (function () {
-    function MessageBase() {
-    }
-    return MessageBase;
-}());
+class MessageBase {
+}
 exports.MessageBase = MessageBase;
-var StringUtils = /** @class */ (function () {
-    function StringUtils() {
-    }
-    StringUtils.ab2str = function (buf) {
+class StringUtils {
+    static ab2str(buf) {
         return String.fromCharCode.apply(null, new Uint16Array(buf));
-    };
+    }
     // 字符串转为ArrayBuffer对象，参数为字符串
-    StringUtils.str2ab = function (str) {
+    static str2ab(str) {
         var buf = new ArrayBuffer(str.length * 2); // 每个字符占用2个字节
         var bufView = new Uint16Array(buf);
         for (var i = 0, strLen = str.length; i < strLen; i++) {
             bufView[i] = str.charCodeAt(i);
         }
         return buf;
-    };
+    }
     /**
      * 从buf 中读取 string
      * @param buf
      * @param offset 开始
      * @param length 长度
      */
-    StringUtils.getString = function (buf, offset) {
+    static getString(buf, offset) {
         var length = new Uint8Array(buf, offset, 1)[0];
         offset += 1;
         var str = String.fromCharCode.apply(null, new Uint16Array(buf, offset, length));
         offset += length;
         return str;
-    };
+    }
     /**
      * 把 string 写入到 buf 中 每个字符 2个byte ,第一位 存储 字符串的长度
      * @param buf
      * @param offset 开始位置
      * @param str 字符串
      */
-    StringUtils.writeString = function (buf, offset, str) {
+    static writeString(buf, offset, str) {
         var length = str.length * 2; // 每个字符占用2个字节
         new Int8Array(buf, offset, 1)[0] = length; //name 长度
         offset += 1;
@@ -128,8 +122,8 @@ var StringUtils = /** @class */ (function () {
             bufView[i] = str.charCodeAt(i);
         }
         return length + 1;
-    };
-    StringUtils.writeString2 = function (dataView, offset, str) {
+    }
+    static writeString2(dataView, offset, str) {
         var length = str.length * 2; // 每个字符占用2个字节
         dataView.setUint8(offset, length);
         offset++;
@@ -141,14 +135,14 @@ var StringUtils = /** @class */ (function () {
             dataView.setUint16(offset, charCodes[i]);
         }
         return length + 1;
-    };
+    }
     /**
     * 从buf 中读取 string
     * @param buf
     * @param offset 开始
     * @param length 长度
     */
-    StringUtils.getString2 = function (dataView, offset) {
+    static getString2(dataView, offset) {
         var length = dataView.getUint8(offset);
         offset += 1;
         var chars = [];
@@ -160,14 +154,10 @@ var StringUtils = /** @class */ (function () {
         ls.text = str;
         ls.offset = offset;
         return ls;
-    };
-    return StringUtils;
-}());
-exports.StringUtils = StringUtils;
-var LengthString = /** @class */ (function () {
-    function LengthString() {
     }
-    return LengthString;
-}());
+}
+exports.StringUtils = StringUtils;
+class LengthString {
+}
 exports.LengthString = LengthString;
 //# sourceMappingURL=Message.js.map

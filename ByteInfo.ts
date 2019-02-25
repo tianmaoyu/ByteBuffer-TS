@@ -1,64 +1,13 @@
 import { Msg } from "./Msg";
 
 
-const Map: { [key: string]: number; } = {};
+const Map1: { [key: string]: number; } = {};
 
 const classPool: Array<Function> = [];
 
+
+
 export class Buffer {
-
-    // public static Wirte(object: Object, buffer: ArrayBuffer, offSet: number, length: number) {
-    //     for (var key in object) {
-    //         if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
-    //             var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", object, key);
-    //             return byteInfo;
-    //             var dv = new DataView(buffer);
-
-    //         }
-    //     }
-    //     return true;
-    // }
-    // public static Wirte(object: Object, buffer?: ArrayBuffer | null, offSet?: number | null, length?: number | null) {
-
-    //     if (object == null) return;
-
-    //     for (var key in object) {
-    //         if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
-    //             var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", object, key);
-    //             return byteInfo;
-    //             var dv = new DataView(buffer);
-
-    //         }
-    //     }
-    //     return true;
-    // }
-
-    // public static Read(object: Object, buffer: ArrayBuffer, offSet: number, length: number) {
-    //     for (var key in object) {
-    //         if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
-    //             var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", object, key);
-
-    //         }
-    //     }
-    //     return true;
-    // }
-
-    //#region  写入 
-
-    // public static WirteObject(obj: Object, buffer?: ArrayBuffer | null, offSet?: number | null, length?: number | null) {
-
-    //     var offSet = 0;
-    //     var objectBuffer = new ArrayBuffer(128);
-    //     var dataView = new DataView(objectBuffer);
-    //     for (var key in obj) {
-    //         var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
-    //         if (byteInfo === undefined) continue;
-    //         var propertyLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[key]);
-    //         offSet += propertyLength;
-    //     }
-    //     return offSet;
-    // }
-
 
     /**
      * 从 buffer 中反射 出 一个 classType 实例
@@ -72,17 +21,15 @@ export class Buffer {
         for (var propertyKey in object) {
             var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", object, propertyKey);
             if (byteInfo === undefined) continue;
-            var propertyLength = this.readProperty(dataView, offSet, byteInfo.Type, object, propertyKey);
+            var propertyLength = this.readProperty(dataView, offSet, byteInfo, object, propertyKey);
             offSet += propertyLength;
         }
-        // for (var info in byteInfos){
-
-        // }
         return object;
     }
 
 
-    private static readProperty(dataView: DataView, offSet: number, type: ByteType, object: Object, propertyKey: string): number {
+    private static readProperty(dataView: DataView, offSet: number, byteInfo: ByteInfo, object: Object, propertyKey: string): number {
+        var type = byteInfo.Type;
         switch (type) {
             case ByteType.Uint8:
                 object[propertyKey] = dataView.getUint8(offSet);
@@ -107,9 +54,47 @@ export class Buffer {
                 return 8;
             case ByteType.String:
                 return Buffer.readString(dataView, offSet, object, propertyKey);
+            case ByteType.Object:
+                let objectLength = dataView.getUint8(offSet);//得到object 的长度
+                offSet++;
+                let objectBuffer = dataView.buffer.slice(offSet, objectLength);
+                object[propertyKey] = Buffer.ReadObject(byteInfo.Function, objectBuffer);
+                return objectLength + 1;
+
+            //array
+            case ByteType.UInt8Array:
+                return Buffer.readUint8Array(dataView, offSet, object, propertyKey);
+            case ByteType.Int8Array:
+                return Buffer.readInt8Array(dataView, offSet, object, propertyKey);
+            case ByteType.Uint16Array:
+                return Buffer.readUint16Array(dataView, offSet, object, propertyKey);
+            case ByteType.Int16Array:
+                return Buffer.readInt16Array(dataView, offSet, object, propertyKey);
+            case ByteType.Int32Array:
+                return Buffer.readInt32Array(dataView, offSet, object, propertyKey);
+            case ByteType.Float32Array:
+                return Buffer.readFloat32Array(dataView, offSet, object, propertyKey);
+            case ByteType.Float64Array:
+                return Buffer.readFloat64Array(dataView, offSet, object, propertyKey);
+            case ByteType.StringArray:
+                return Buffer.readString(dataView, offSet, object, propertyKey);
+            case ByteType.ObjectArray:
+                return Buffer.readString(dataView, offSet, object, propertyKey);
         }
 
     }
+
+    private static readUint8Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
+        var length = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < length; i++ , offset++) {
+            array.push(dataView.getUint8(offset));
+        }
+        object[propertyKey] = array;
+        return length + 1;
+    }
+
 
     /**
       * 从buf 中读取 string
@@ -175,31 +160,31 @@ export class Buffer {
             case ByteType.Float64:
                 dataView.setFloat64(offSet, value as number)
                 return 8;
-            // case ByteType.Object:
-            //     return Buffer.GetObjectLength(value as object)
+            case ByteType.Object:
+                return Buffer.GetObjectLength(value as object)
             case ByteType.String:
                 return Buffer.writeString(dataView, offSet, value as string);
 
-            // //数组
-            // case ByteType.UInt8Array:
-            //     return 1 * (value as Array<number>).length;
-            // case ByteType.Int8Array:
-            //     return 1 * (value as Array<number>).length;
-            // case ByteType.Uint16Array:
-            //     return 2 * (value as Array<number>).length;
-            // case ByteType.Int16Array:
-            //     return 2 * (value as Array<number>).length;
-            // case ByteType.Int32Array:
-            //     return 4 * (value as Array<number>).length;
-            // case ByteType.Float32Array:
-            //     return 4 * (value as Array<number>).length;
-            // case ByteType.Float64Array:
-            //     return 8 * (value as Array<number>).length;
+            //数组
+            case ByteType.UInt8Array:
+                return 1 * (value as Array<number>).length;
+            case ByteType.Int8Array:
+                return 1 * (value as Array<number>).length;
+            case ByteType.Uint16Array:
+                return 2 * (value as Array<number>).length;
+            case ByteType.Int16Array:
+                return 2 * (value as Array<number>).length;
+            case ByteType.Int32Array:
+                return 4 * (value as Array<number>).length;
+            case ByteType.Float32Array:
+                return 4 * (value as Array<number>).length;
+            case ByteType.Float64Array:
+                return 8 * (value as Array<number>).length;
 
-            // case ByteType.ObjectArray:
-            //     return Buffer.getObjectArrayLength(value as Array<object>)
-            // case ByteType.StringArray:
-            //     return Buffer.getStringArrayLength(value as Array<string>)
+            case ByteType.ObjectArray:
+                return Buffer.getObjectArrayLength(value as Array<object>)
+            case ByteType.StringArray:
+                return Buffer.getStringArrayLength(value as Array<string>)
         }
 
     }
@@ -232,6 +217,7 @@ export class Buffer {
      * @param obj 
      */
     public static GetObjectLength(obj: Object) {
+
         var objectLength = 0;
         if (obj === null || obj === undefined) {
             return objectLength;
@@ -320,12 +306,19 @@ export class Buffer {
 }
 
 /**
- * ByteMember 装饰器
+ * ByteMember 属性修饰
  * @param order 
  * @param type 
  */
-export function ByteMember(order: number, type: ByteType) {
-    return Reflect.metadata("ByteMember", new ByteInfo(order, type));
+export function ByteMember(order: number, type: ByteType, fun: Function = null) {
+    return Reflect.metadata("ByteMember", new ByteInfo(order, type, fun));
+}
+
+/**类修饰
+ * 
+ */
+export function BtyeContract(target: any) {
+
 }
 
 /**
@@ -334,9 +327,11 @@ export function ByteMember(order: number, type: ByteType) {
 export class ByteInfo {
     public Order: number;
     public Type: ByteType;
-    constructor(order: number, type: ByteType) {
+    public Function: Function;
+    constructor(order: number, type: ByteType, fun: Function = null) {
         this.Order = order;
         this.Type = type;
+        this.Function = fun;
     }
 }
 

@@ -36,6 +36,7 @@ export class BufferWriteRead {
 
     public static ViewArrayTest() {
 
+       
         var uint8Array = new Uint8Array(4);
         uint8Array[0] = 0;
         uint8Array[1] = 1;
@@ -71,7 +72,7 @@ export class BufferWriteRead {
 
     /**
      * string 转换为 
-     * 每个字符占用2个字节
+     * unicode 编码:每个字符占用2个字节
      * @param str 
      */
     public static str2ab(str: string): ArrayBuffer {

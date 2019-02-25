@@ -1,8 +1,12 @@
 import { BufferWriteRead } from "./BufferWriteRead";
 import { UserMessage, MessageType } from "./Message";
 import { getFormat, format } from "./Reflect";
-import { Msg, User } from './Msg';
+import { Msg, User, Role } from './Msg';
 import { Buffer, Instance } from './ByteInfo';
+
+
+
+var role=new Role();
 
 
 const MsgPool: { [key: number]: any; } = {};
@@ -14,10 +18,22 @@ var _obj =new ClassPool["Msg"]();
 
 var msg = new Msg();//sss
 msg.MessageType = MessageType.msg1;
-msg.Address = "深圳";
-msg.Bool = false;
-msg.Name = "eric";
-msg.Id = 1000;
+// msg.Address = "深圳";
+// msg.Bool = false;
+// msg.Name = "eric";
+// msg.Id = 1000;
+// var role=new Role();
+// role.Id=1;
+// role.Name="admin";
+var user=new User();
+user.Id=1;
+user.Name="user"
+msg.User=user;
+var user2=new User();
+user2.Id=2;
+user2.Name="user2";
+msg.UserList=[];
+msg.UserList.push(user2);
 
 var buffer = Buffer.WirteObject(msg);
 console.info(buffer.byteLength);
@@ -43,6 +59,7 @@ function create<T>(constructor: any, ...parms: any): T {
 }
 console.info(Team);
 var classType: Function[] = [];
+console.info(classType)
 classType.push(Team);
 console.info(classType[0]);
 
@@ -110,21 +127,21 @@ var buf2 = new ArrayBuffer(10);
 
 
 //BufferWriteRead.StringTest();
-var msg2 = new UserMessage();
-msg2.MessageType = MessageType.msg1;
-msg2.Address = "深圳大发好啊%￥……&*（";
-msg2.Bool = true;
-msg2.Id = 20000;
-msg2.Name = "稍等哈的身份sdjfhsjdf实得分e";
-var buf = msg2.serialize2();
+// var msg2 = new UserMessage();
+// msg2.MessageType = MessageType.msg1;
+// msg2.Address = "深圳大发好啊%￥……&*（";
+// msg2.Bool = true;
+// msg2.Id = 20000;
+// msg2.Name = "稍等哈的身份sdjfhsjdf实得分e";
+// var buf = msg2.serialize2();
 
-var dv = new Int8Array(buf);
-dv.forEach(i => console.info(i));
+// var dv = new Int8Array(buf);
+// dv.forEach(i => console.info(i));
 
-console.info(buf.byteLength);
-var _msg = UserMessage.deserialize(buf);
-console.info(_msg);
-var addressFormate = getFormat(msg, "Address")
+// console.info(buf.byteLength);
+// var _msg = UserMessage.deserialize(buf);
+// console.info(_msg);
+// var addressFormate = getFormat(msg, "Address")
 // export class Startup {
 //   public static main(): number {
 //     console.log("Hello World");
