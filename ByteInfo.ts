@@ -55,11 +55,7 @@ export class Buffer {
             case ByteType.String:
                 return Buffer.readString(dataView, offSet, object, propertyKey);
             case ByteType.Object:
-                let objectLength = dataView.getUint8(offSet);//得到object 的长度
-                offSet++;
-                let objectBuffer = dataView.buffer.slice(offSet, objectLength);
-                object[propertyKey] = Buffer.ReadObject(byteInfo.Function, objectBuffer);
-                return objectLength + 1;
+                return Buffer.readInerObject(dataView, offSet, object, propertyKey,byteInfo);
 
             //array
             case ByteType.UInt8Array:
@@ -77,12 +73,48 @@ export class Buffer {
             case ByteType.Float64Array:
                 return Buffer.readFloat64Array(dataView, offSet, object, propertyKey);
             case ByteType.StringArray:
-                return Buffer.readString(dataView, offSet, object, propertyKey);
+                return Buffer.readStringArray(dataView, offSet, object, propertyKey);
             case ByteType.ObjectArray:
-                return Buffer.readString(dataView, offSet, object, propertyKey);
+                return Buffer.readInerObjectArray(dataView, offSet, object, propertyKey,byteInfo);
         }
 
     }
+
+
+    private static readInerObject(dataView: DataView, offset: number, object: Object, propertyKey: string,byteInfo:ByteInfo): number{
+        var length = dataView.getUint8(offset);
+        offset += 1;
+        if(length==0) {
+            object[propertyKey] = null;
+            return length + 1;
+        }
+        let objectBuffer = dataView.buffer.slice(offset, length);
+        object[propertyKey] = Buffer.ReadObject(byteInfo.Function, objectBuffer);
+        return length + 1;
+    }
+
+
+    private static readInerObjectArray(dataView: DataView, offset: number, object: Object, propertyKey: string,byteInfo:ByteInfo): number{
+        var totalLength=0;
+        var arrayLength = dataView.getUint8(offset);
+        offset += 1;
+        var arrayObject=[];
+        for(let i=0;i<arrayLength;i++){
+            var length = dataView.getUint8(offset);
+            offset += 1;
+            totalLength+=length+1;
+            if(length==0) {
+                arrayObject.push(null);
+                continue;
+            }
+            let objectBuffer = dataView.buffer.slice(offset, length);
+            var obj = Buffer.ReadObject(byteInfo.Function, objectBuffer);
+            arrayObject.push(obj);
+        }
+        object[propertyKey] = arrayObject;
+        return totalLength + 1;
+    }
+
 
     private static readUint8Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
         var length = dataView.getUint8(offset);
@@ -94,6 +126,95 @@ export class Buffer {
         object[propertyKey] = array;
         return length + 1;
     }
+
+    private static readInt8Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
+        var length = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < length; i++ , offset++) {
+            array.push(dataView.getInt8(offset));
+        }
+        object[propertyKey] = array;
+        return length + 1;
+    }
+
+    private static readUint16Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
+        var length = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < length / 2; i++ , offset += 2) {
+            array.push(dataView.getUint16(offset));
+        }
+        object[propertyKey] = array;
+        return length + 1;
+    }
+
+    private static readInt16Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
+        var length = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < length / 2; i++ , offset += 2) {
+            array.push(dataView.getInt16(offset));
+        }
+        object[propertyKey] = array;
+        return length + 1;
+    }
+
+    private static readInt32Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
+        var length = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < length / 4; i++ , offset += 4) {
+            array.push(dataView.getInt32(offset));
+        }
+        object[propertyKey] = array;
+        return length + 1;
+    }
+
+    private static readFloat32Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
+        var length = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < length / 4; i++ , offset += 4) {
+            array.push(dataView.getFloat32(offset));
+        }
+        object[propertyKey] = array;
+        return length + 1;
+    }
+
+    private static readFloat64Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
+        var length = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < length / 8; i++ , offset += 8) {
+            array.push(dataView.getFloat64(offset));
+        }
+        object[propertyKey] = array;
+        return length + 1;
+    }
+
+
+    private static readStringArray(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
+        var totalLength=0;//数组所占的长度
+        var arraryLength = dataView.getUint8(offset);
+        offset += 1;
+        var arrar=[];
+        for (let j = 0; j < arraryLength; j++) {
+            var length = dataView.getUint8(offset);
+            offset += 1;
+            var chars = [];
+            for (var i = 0; i < length / 2; i++ , offset += 2) {
+                chars.push(dataView.getUint16(offset));
+            }
+            var str = String.fromCharCode.apply(null, chars);
+            arrar.push(str);
+            totalLength+=length+1;
+        }
+        object[propertyKey] = arrar;
+        return totalLength + 1;
+    }
+
+    
 
 
     /**
@@ -314,8 +435,9 @@ export function ByteMember(order: number, type: ByteType, fun: Function = null) 
     return Reflect.metadata("ByteMember", new ByteInfo(order, type, fun));
 }
 
-/**类修饰
- * 
+/**
+ * 类修饰
+ * 需要序列化的类的 标识
  */
 export function BtyeContract(target: any) {
 
@@ -362,88 +484,3 @@ export enum ByteType {
     StringArray = 19,
     ObjectArray = 20,
 }
-
-//反射对象 https://zhuanlan.zhihu.com/p/22962797
-export function Instance<T>(_constructor: { new(...args: Array<any>): T }): T {
-    return new _constructor
-}
-
-
-// export interface IByteOptions {
-//     Order: number;
-//     Type: ByteType;
-// }
-// export class ByteWrite {
-
-//     public static Valid(object: Object) {
-//         for (var key in object) {
-//             if (typeof key == "string" || typeof key == "number" || typeof key == "boolean") {
-//                 var validate = <Validation>Reflect.getMetadata("ByteMember", object, key);
-//                 if (validate !== undefined) {
-//                     if (validate.Validate(object[key]) == false)
-//                         return false;
-//                 }
-//             }
-//         }
-//         return true;
-//     }
-// }
-
-// export interface IByteOptions {
-//     Order: number;
-//     Type: ByteType;
-//     Number?: INumberOptions;
-//     String?: IStringOptions;
-// }
-// export interface IStringOptions {
-//     MinLength?: number;
-//     MaxLength?: number;
-// }
-
-// export interface INumberOptions {
-//     Min?: number;
-//     Max?: number;
-// }
-
-// export interface ITimeValidationOptions {
-//     Format: string;
-//     Locale?: string;
-// }
-
-// export class Validation {
-
-//     private static _validationRules: any = {
-//         Number: (value: number, options: INumberOptions) => {
-//             if (typeof value !== "number")
-//                 return false;
-
-//             if (options.Max !== undefined && options.Min !== undefined)
-//                 return value < options.Max && value > options.Min;
-
-//             return (options.Max !== undefined && value < options.Max) ||
-//                 (options.Min !== undefined && value > options.Min);
-//         },
-//         String: (value: string, options: IStringOptions) => {
-//             if (typeof value !== "string")
-//                 return false;
-
-//             if (options.MaxLength !== undefined && options.MinLength !== undefined)
-//                 return value.length < options.MaxLength && value.length > options.MinLength;
-
-//             return (options.MaxLength !== undefined && value.length < options.MaxLength) ||
-//                 (options.MinLength !== undefined && value.length > options.MinLength);
-//         },
-//     };
-
-//     constructor(private _options: IByteOptions) {
-//     }
-
-//     Validate(value: any): boolean {
-//         for (var key in this._options) {
-//             if (Validation._validationRules[key](value, this._options[key]) === false) {
-//                 return false;
-//             }
-//         }
-//         return true;
-//     }
-// }

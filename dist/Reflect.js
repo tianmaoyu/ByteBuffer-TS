@@ -36,6 +36,11 @@ function log(target, key, value) {
         }
     };
 }
+//反射对象 https://zhuanlan.zhihu.com/p/22962797
+function Instance(_constructor) {
+    return new _constructor;
+}
+exports.Instance = Instance;
 function logProperty(target, key) {
     console.info("反射:" + key);
     console.info(target);

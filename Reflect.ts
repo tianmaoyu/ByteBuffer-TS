@@ -43,6 +43,11 @@ function log(target: Function, key: string, value: any) {
     };
 }
 
+//反射对象 https://zhuanlan.zhihu.com/p/22962797
+export function Instance<T>(_constructor: { new(...args: Array<any>): T }): T {
+    return new _constructor
+}
+
 
 export function logProperty(target: any, key: string) {
     console.info("反射:"+key)
