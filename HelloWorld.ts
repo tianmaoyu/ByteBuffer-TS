@@ -2,7 +2,7 @@ import { BufferWriteRead } from "./BufferWriteRead";
 import { UserMessage, MessageType } from "./Message";
 import { getFormat, format } from "./Reflect";
 import { Msg, User, Role } from './Msg';
-import { Buffer, Instance } from './ByteInfo';
+import { Buffer } from './ByteInfo';
 
 
 

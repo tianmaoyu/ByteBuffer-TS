@@ -9,6 +9,7 @@ const classPool: Array<Function> = [];
 
 export class Buffer {
 
+    //#region  read method
     /**
      * 从 buffer 中反射 出 一个 classType 实例
      * @param classType 
@@ -55,7 +56,7 @@ export class Buffer {
             case ByteType.String:
                 return Buffer.readString(dataView, offSet, object, propertyKey);
             case ByteType.Object:
-                return Buffer.readInerObject(dataView, offSet, object, propertyKey,byteInfo);
+                return Buffer.readInnerObject(dataView, offSet, object, propertyKey,byteInfo);
 
             //array
             case ByteType.UInt8Array:
@@ -75,13 +76,13 @@ export class Buffer {
             case ByteType.StringArray:
                 return Buffer.readStringArray(dataView, offSet, object, propertyKey);
             case ByteType.ObjectArray:
-                return Buffer.readInerObjectArray(dataView, offSet, object, propertyKey,byteInfo);
+                return Buffer.readInnerObjectArray(dataView, offSet, object, propertyKey,byteInfo);
         }
 
     }
 
 
-    private static readInerObject(dataView: DataView, offset: number, object: Object, propertyKey: string,byteInfo:ByteInfo): number{
+    private static readInnerObject(dataView: DataView, offset: number, object: Object, propertyKey: string,byteInfo:ByteInfo): number{
         var length = dataView.getUint8(offset);
         offset += 1;
         if(length==0) {
@@ -94,7 +95,7 @@ export class Buffer {
     }
 
 
-    private static readInerObjectArray(dataView: DataView, offset: number, object: Object, propertyKey: string,byteInfo:ByteInfo): number{
+    private static readInnerObjectArray(dataView: DataView, offset: number, object: Object, propertyKey: string,byteInfo:ByteInfo): number{
         var totalLength=0;
         var arrayLength = dataView.getUint8(offset);
         offset += 1;
@@ -235,9 +236,9 @@ export class Buffer {
         return length + 1;
     }
 
+//#endregion
 
-
-
+    //#region write method
     public static WirteObject(obj: Object) {
         var offSet = 0;
         var catheBuffer = new ArrayBuffer(128);
@@ -282,7 +283,7 @@ export class Buffer {
                 dataView.setFloat64(offSet, value as number)
                 return 8;
             case ByteType.Object:
-                return Buffer.GetObjectLength(value as object)
+                return Buffer.wirteInnerObject(dataView, offSet,value as object)
             case ByteType.String:
                 return Buffer.writeString(dataView, offSet, value as string);
 
@@ -303,11 +304,51 @@ export class Buffer {
                 return 8 * (value as Array<number>).length;
 
             case ByteType.ObjectArray:
-                return Buffer.getObjectArrayLength(value as Array<object>)
+                return Buffer.wirteInnerObjectArray(dataView, offSet, value as Array<object>)
             case ByteType.StringArray:
-                return Buffer.getStringArrayLength(value as Array<string>)
+                return Buffer.writeStringArray(dataView, offSet,value as Array<string>)
         }
 
+    }
+
+     
+
+
+    /**
+     * 内部类 
+     * @param dataView 
+     * @param offSet 
+     * @param obj 
+     */
+    private static wirteInnerObject(dataView: DataView, offSet: number,obj: Object):number {
+        var totalLength=Buffer.GetObjectLength(obj);
+        dataView.setUint8(offSet, totalLength)
+        offSet++;
+        for (var key in obj) {
+            var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
+            if (byteInfo === undefined) continue;
+            var propertyLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[key]);
+            offSet += propertyLength;
+        }
+        return totalLength+1;
+    }
+    /**
+     * 内部类 array
+     * @param dataView 
+     * @param offSet 
+     * @param obj 
+     */
+    private static wirteInnerObjectArray(dataView: DataView, offSet: number,objArray: Object[]) {
+        var totalLength=0;
+        var arrayLength = objArray.length;
+        dataView.setUint8(offSet, arrayLength)
+        offSet++;
+        for(let i=0;i<arrayLength;i++){
+            let _obj=objArray[i];
+            let _objLength= Buffer.wirteInnerObject(dataView,offSet,_obj);
+            totalLength+=_objLength;
+        }
+        return totalLength+1;
     }
 
     /**
@@ -328,11 +369,26 @@ export class Buffer {
         return length + 1;
     }
 
+    /**
+     * 写入字符串 数组
+     */
+    private static writeStringArray(dataView: DataView, offset: number, strArray: string[]): number {
+        var totalLength=0;
+        var arrayLegth=strArray.length||0;
+        dataView.setUint8(offset, arrayLegth);// 1 字节写入长度
+        offset++;
+        for(let i=0;i<arrayLegth;i++){
+            let str=strArray[i];
+            let strLegth= Buffer.writeString(dataView, offset,str);
+            totalLength+=strLegth;
+        }
+        return totalLength + 1;
+    }
 
     //#endregion
 
 
-    //#region  长度  计算
+    //#region  length method  
     /**
      * 得到 object 对象 二进制 长度
      * @param obj 
