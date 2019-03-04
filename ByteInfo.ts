@@ -397,7 +397,7 @@ export class Buffer {
      * @param obj 
      */
     private static wirteInnerObject(dataView: DataView, offSet: number, obj: Object): number {
-        var totalLength = Buffer.GetObjectLength(obj);
+        var totalLength = Buffer.GetObjectByteLength(obj);
         dataView.setUint8(offSet, totalLength)
         offSet++;
         for (var key in obj) {
@@ -470,7 +470,7 @@ export class Buffer {
      * 得到 object 对象 二进制 长度
      * @param obj 
      */
-    public static GetObjectLength(obj: Object) {
+    public static GetObjectByteLength(obj: Object) {
         var objectLength = 0;
         if (obj === null || obj === undefined) {
             return objectLength;
@@ -488,6 +488,7 @@ export class Buffer {
 
     /**
      * 得到 属性 二进制 长度
+     * 如果是数组，
      * @param type 
      * @param value 
      */
@@ -508,9 +509,9 @@ export class Buffer {
             case ByteType.Float64:
                 return 8;
             case ByteType.Object:
-                return Buffer.GetObjectLength(value as object)
+                return Buffer.GetObjectByteLength(value as object)
             case ByteType.String:
-                return Buffer.getStringLength(value as string);
+                return Buffer.getStringByteLength(value as string);
 
             //数组  number 如果数组为空 则 需要一bit 做标志位 
             case ByteType.UInt8Array:
@@ -556,29 +557,29 @@ export class Buffer {
                     return length == 0 ? 1 : length * 8 +1;
                 }
             case ByteType.ObjectArray:
-                return Buffer.getObjectArrayLength(value as Array<object>)
+                return Buffer.getObjectArrayByteLength(value as Array<object>)
             case ByteType.StringArray:
-                return Buffer.getStringArrayLength(value as Array<string>)
+                return Buffer.getStringArrayByteLength(value as Array<string>)
         }
 
     }
 
-    private static getStringLength(str: string): number {
+    private static getStringByteLength(str: string): number {
         return str.length * 2+1 ;//
     }
 
-    private static getStringArrayLength(strArray: Array<string>): number {
+    private static getStringArrayByteLength(strArray: Array<string>): number {
         var length = 0
         for (var i = 0; i < strArray.length; i++) {
-            length += Buffer.getStringLength(strArray[i]);
+            length += Buffer.getStringByteLength(strArray[i]);
         }
         return length+1;
     }
 
-    private static getObjectArrayLength(objArray: Array<object>) {
+    private static getObjectArrayByteLength(objArray: Array<object>) {
         var length = 0;
         for (var i = 0; i < objArray.length; i++) {
-            length += Buffer.GetObjectLength(objArray[i]);
+            length += Buffer.GetObjectByteLength(objArray[i]);
         }
         return length+1;
     }
