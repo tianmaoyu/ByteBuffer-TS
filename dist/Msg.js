@@ -12,6 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Message_1 = require("./Message");
 const ByteInfo_1 = require("./ByteInfo");
 let User = class User {
+    constructor() {
+        this.Id = undefined;
+        this.Name = undefined;
+    }
 };
 __decorate([
     ByteInfo_1.ByteMember(1, ByteInfo_1.ByteType.Uint16),

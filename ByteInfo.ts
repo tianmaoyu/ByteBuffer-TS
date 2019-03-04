@@ -89,7 +89,7 @@ export class Buffer {
             object[propertyKey] = null;
             return length + 1;
         }
-        let objectBuffer = dataView.buffer.slice(offset, length);
+        let objectBuffer = dataView.buffer.slice(offset, length+offset);
         object[propertyKey] = Buffer.ReadObject(byteInfo.Function, objectBuffer);
         return length + 1;
     }
@@ -108,9 +108,10 @@ export class Buffer {
                 arrayObject.push(null);
                 continue;
             }
-            let objectBuffer = dataView.buffer.slice(offset, length);
+            let objectBuffer = dataView.buffer.slice(offset, length+offset);
             var obj = Buffer.ReadObject(byteInfo.Function, objectBuffer);
             arrayObject.push(obj);
+            offset+=length;
         }
         object[propertyKey] = arrayObject;
         return totalLength + 1;
@@ -289,19 +290,19 @@ export class Buffer {
 
             //数组
             case ByteType.UInt8Array:
-                return 1 * (value as Array<number>).length;
+                return Buffer.writeUint8Array(dataView, offSet, value as Array<number>);
             case ByteType.Int8Array:
-                return 1 * (value as Array<number>).length;
+                return Buffer.writeInt8Array(dataView, offSet, value as Array<number>);
             case ByteType.Uint16Array:
-                return 2 * (value as Array<number>).length;
+                return Buffer.writeUint16Array(dataView, offSet, value as Array<number>);
             case ByteType.Int16Array:
-                return 2 * (value as Array<number>).length;
+                return Buffer.writeInt16Array(dataView, offSet, value as Array<number>);
             case ByteType.Int32Array:
-                return 4 * (value as Array<number>).length;
+                return Buffer.writeInt32Array(dataView, offSet, value as Array<number>);
             case ByteType.Float32Array:
-                return 4 * (value as Array<number>).length;
+                return Buffer.writeFloat32Array(dataView, offSet, value as Array<number>);
             case ByteType.Float64Array:
-                return 8 * (value as Array<number>).length;
+                return Buffer.writeFloat64Array(dataView, offSet, value as Array<number>);
 
             case ByteType.ObjectArray:
                 return Buffer.wirteInnerObjectArray(dataView, offSet, value as Array<object>)
@@ -311,8 +312,6 @@ export class Buffer {
 
     }
 
-
-    
 
     private static writeUint8Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
         var arrayLength=array.length;
@@ -423,6 +422,7 @@ export class Buffer {
         for (let i = 0; i < arrayLength; i++) {
             let _obj = objArray[i];
             let _objLength = Buffer.wirteInnerObject(dataView, offSet, _obj);
+            offSet+=_objLength;
             totalLength += _objLength;
         }
         return totalLength + 1;

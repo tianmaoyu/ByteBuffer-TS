@@ -31,7 +31,7 @@ user.Name="user"
 msg.User=user;
 var user2=new User();
 user2.Id=2;
-user2.Name="user2";
+user2.Name="use1";
 msg.UserList=[];
 msg.UserList.push(user2);
 

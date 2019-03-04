@@ -5,9 +5,9 @@ import { ByteMember, ByteType, BtyeContract } from './ByteInfo';
 @BtyeContract
 export class User {
     @ByteMember(1, ByteType.Uint16)
-    public Id: number;
+    public Id: number=undefined;
     @ByteMember(2, ByteType.String)
-    public Name: String;
+    public Name: String=undefined;
 }
 
 /**测试 */
