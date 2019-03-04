@@ -56,7 +56,7 @@ export class Buffer {
             case ByteType.String:
                 return Buffer.readString(dataView, offSet, object, propertyKey);
             case ByteType.Object:
-                return Buffer.readInnerObject(dataView, offSet, object, propertyKey,byteInfo);
+                return Buffer.readInnerObject(dataView, offSet, object, propertyKey, byteInfo);
 
             //array
             case ByteType.UInt8Array:
@@ -76,16 +76,16 @@ export class Buffer {
             case ByteType.StringArray:
                 return Buffer.readStringArray(dataView, offSet, object, propertyKey);
             case ByteType.ObjectArray:
-                return Buffer.readInnerObjectArray(dataView, offSet, object, propertyKey,byteInfo);
+                return Buffer.readInnerObjectArray(dataView, offSet, object, propertyKey, byteInfo);
         }
 
     }
 
 
-    private static readInnerObject(dataView: DataView, offset: number, object: Object, propertyKey: string,byteInfo:ByteInfo): number{
+    private static readInnerObject(dataView: DataView, offset: number, object: Object, propertyKey: string, byteInfo: ByteInfo): number {
         var length = dataView.getUint8(offset);
         offset += 1;
-        if(length==0) {
+        if (length == 0) {
             object[propertyKey] = null;
             return length + 1;
         }
@@ -95,16 +95,16 @@ export class Buffer {
     }
 
 
-    private static readInnerObjectArray(dataView: DataView, offset: number, object: Object, propertyKey: string,byteInfo:ByteInfo): number{
-        var totalLength=0;
+    private static readInnerObjectArray(dataView: DataView, offset: number, object: Object, propertyKey: string, byteInfo: ByteInfo): number {
+        var totalLength = 0;
         var arrayLength = dataView.getUint8(offset);
         offset += 1;
-        var arrayObject=[];
-        for(let i=0;i<arrayLength;i++){
+        var arrayObject = [];
+        for (let i = 0; i < arrayLength; i++) {
             var length = dataView.getUint8(offset);
             offset += 1;
-            totalLength+=length+1;
-            if(length==0) {
+            totalLength += length + 1;
+            if (length == 0) {
                 arrayObject.push(null);
                 continue;
             }
@@ -196,10 +196,10 @@ export class Buffer {
 
 
     private static readStringArray(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
-        var totalLength=0;//数组所占的长度
+        var totalLength = 0;//数组所占的长度
         var arraryLength = dataView.getUint8(offset);
         offset += 1;
-        var arrar=[];
+        var arrar = [];
         for (let j = 0; j < arraryLength; j++) {
             var length = dataView.getUint8(offset);
             offset += 1;
@@ -209,13 +209,13 @@ export class Buffer {
             }
             var str = String.fromCharCode.apply(null, chars);
             arrar.push(str);
-            totalLength+=length+1;
+            totalLength += length + 1;
         }
         object[propertyKey] = arrar;
         return totalLength + 1;
     }
 
-    
+
 
 
     /**
@@ -236,7 +236,7 @@ export class Buffer {
         return length + 1;
     }
 
-//#endregion
+    //#endregion
 
     //#region write method
     public static WirteObject(obj: Object) {
@@ -283,7 +283,7 @@ export class Buffer {
                 dataView.setFloat64(offSet, value as number)
                 return 8;
             case ByteType.Object:
-                return Buffer.wirteInnerObject(dataView, offSet,value as object)
+                return Buffer.wirteInnerObject(dataView, offSet, value as object)
             case ByteType.String:
                 return Buffer.writeString(dataView, offSet, value as string);
 
@@ -306,13 +306,90 @@ export class Buffer {
             case ByteType.ObjectArray:
                 return Buffer.wirteInnerObjectArray(dataView, offSet, value as Array<object>)
             case ByteType.StringArray:
-                return Buffer.writeStringArray(dataView, offSet,value as Array<string>)
+                return Buffer.writeStringArray(dataView, offSet, value as Array<string>)
         }
 
     }
 
-     
 
+    
+
+    private static writeUint8Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
+        var arrayLength=array.length;
+        dataView.setUint8(offset,arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setUint8(offset,array[i]);
+            offset++;
+        }
+        return length + 1;
+    }
+
+    private static writeInt8Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
+        var arrayLength=array.length;
+        dataView.setUint8(offset,arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setInt8(offset,array[i]);
+            offset++;
+        }
+        return length + 1;
+    }
+
+    private static writeUint16Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
+        var arrayLength=array.length;
+        dataView.setUint8(offset,arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setUint16(offset,array[i]);
+            offset+=2;
+        }
+        return length*2 + 1;
+    }
+
+    private static writeInt16Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
+        var arrayLength=array.length;
+        dataView.setUint8(offset,arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setInt16(offset,array[i]);
+            offset+=2;
+        }
+        return length*2 + 1;
+    }
+
+    private static writeInt32Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
+        var arrayLength=array.length;
+        dataView.setUint8(offset,arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setInt32(offset,array[i]);
+            offset+=4;
+        }
+        return length*4 + 1;
+    }
+
+    private static writeFloat32Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
+        var arrayLength=array.length;
+        dataView.setUint8(offset,arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setFloat32(offset,array[i]);
+            offset+=4;
+        }
+        return length*4 + 1;
+    }
+
+    private static writeFloat64Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
+        var arrayLength=array.length;
+        dataView.setUint8(offset,arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setFloat64(offset,array[i]);
+            offset+=8;
+        }
+        return length*8 + 1;
+    }
 
     /**
      * 内部类 
@@ -320,8 +397,8 @@ export class Buffer {
      * @param offSet 
      * @param obj 
      */
-    private static wirteInnerObject(dataView: DataView, offSet: number,obj: Object):number {
-        var totalLength=Buffer.GetObjectLength(obj);
+    private static wirteInnerObject(dataView: DataView, offSet: number, obj: Object): number {
+        var totalLength = Buffer.GetObjectLength(obj);
         dataView.setUint8(offSet, totalLength)
         offSet++;
         for (var key in obj) {
@@ -330,7 +407,7 @@ export class Buffer {
             var propertyLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[key]);
             offSet += propertyLength;
         }
-        return totalLength+1;
+        return totalLength + 1;
     }
     /**
      * 内部类 array
@@ -338,17 +415,17 @@ export class Buffer {
      * @param offSet 
      * @param obj 
      */
-    private static wirteInnerObjectArray(dataView: DataView, offSet: number,objArray: Object[]) {
-        var totalLength=0;
+    private static wirteInnerObjectArray(dataView: DataView, offSet: number, objArray: Object[]) {
+        var totalLength = 0;
         var arrayLength = objArray.length;
         dataView.setUint8(offSet, arrayLength)
         offSet++;
-        for(let i=0;i<arrayLength;i++){
-            let _obj=objArray[i];
-            let _objLength= Buffer.wirteInnerObject(dataView,offSet,_obj);
-            totalLength+=_objLength;
+        for (let i = 0; i < arrayLength; i++) {
+            let _obj = objArray[i];
+            let _objLength = Buffer.wirteInnerObject(dataView, offSet, _obj);
+            totalLength += _objLength;
         }
-        return totalLength+1;
+        return totalLength + 1;
     }
 
     /**
@@ -373,14 +450,14 @@ export class Buffer {
      * 写入字符串 数组
      */
     private static writeStringArray(dataView: DataView, offset: number, strArray: string[]): number {
-        var totalLength=0;
-        var arrayLegth=strArray.length||0;
+        var totalLength = 0;
+        var arrayLegth = strArray.length || 0;
         dataView.setUint8(offset, arrayLegth);// 1 字节写入长度
         offset++;
-        for(let i=0;i<arrayLegth;i++){
-            let str=strArray[i];
-            let strLegth= Buffer.writeString(dataView, offset,str);
-            totalLength+=strLegth;
+        for (let i = 0; i < arrayLegth; i++) {
+            let str = strArray[i];
+            let strLegth = Buffer.writeString(dataView, offset, str);
+            totalLength += strLegth;
         }
         return totalLength + 1;
     }
@@ -394,7 +471,6 @@ export class Buffer {
      * @param obj 
      */
     public static GetObjectLength(obj: Object) {
-
         var objectLength = 0;
         if (obj === null || obj === undefined) {
             return objectLength;
@@ -436,22 +512,49 @@ export class Buffer {
             case ByteType.String:
                 return Buffer.getStringLength(value as string);
 
-            //数组
+            //数组  number 如果数组为空 则 需要一bit 做标志位 
             case ByteType.UInt8Array:
-                return 1 * (value as Array<number>).length;
+                {
+                    if (value == null) return 1;
+                    let length = (value as Array<number>).length;
+                    return length == 0 ? 1 : length;
+                }
             case ByteType.Int8Array:
-                return 1 * (value as Array<number>).length;
+                {
+                    if (value == null) return 1;
+                    let length = (value as Array<number>).length;
+                    return length == 0 ? 1 : length;
+                }
             case ByteType.Uint16Array:
-                return 2 * (value as Array<number>).length;
+                {
+                    if (value == null) return 1;
+                    let length = (value as Array<number>).length;
+                    return length == 0 ? 1 : length * 2;
+                }
             case ByteType.Int16Array:
-                return 2 * (value as Array<number>).length;
+                {
+                    if (value == null) return 1;
+                    let length = (value as Array<number>).length;
+                    return length == 0 ? 1 : length * 2;
+                }
             case ByteType.Int32Array:
-                return 4 * (value as Array<number>).length;
+                {
+                    if (value == null) return 1;
+                    let length = (value as Array<number>).length;
+                    return length == 0 ? 1 : length * 4;
+                }
             case ByteType.Float32Array:
-                return 4 * (value as Array<number>).length;
+                {
+                    if (value == null) return 1;
+                    let length = (value as Array<number>).length;
+                    return length == 0 ? 1 : length * 4;
+                }
             case ByteType.Float64Array:
-                return 8 * (value as Array<number>).length;
-
+                {
+                    if (value == null) return 1;
+                    let length = (value as Array<number>).length;
+                    return length == 0 ? 1 : length * 8;
+                }
             case ByteType.ObjectArray:
                 return Buffer.getObjectArrayLength(value as Array<object>)
             case ByteType.StringArray:
@@ -467,7 +570,7 @@ export class Buffer {
     private static getStringArrayLength(strArray: Array<string>): number {
         var length = 0
         for (var i = 0; i < strArray.length; i++) {
-            length += this.getStringLength(strArray[i]);
+            length += Buffer.getStringLength(strArray[i]);
         }
         return length;
     }
@@ -475,7 +578,7 @@ export class Buffer {
     private static getObjectArrayLength(objArray: Array<object>) {
         var length = 0;
         for (var i = 0; i < objArray.length; i++) {
-            length += this.GetObjectLength(objArray[i]);
+            length += Buffer.GetObjectLength(objArray[i]);
         }
         return length;
     }

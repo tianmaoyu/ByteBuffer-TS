@@ -277,6 +277,76 @@ class Buffer {
                 return Buffer.writeStringArray(dataView, offSet, value);
         }
     }
+    static writeUint8Array(dataView, offset, array = []) {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setUint8(offset, array[i]);
+            offset++;
+        }
+        return length + 1;
+    }
+    static writeInt8Array(dataView, offset, array = []) {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setInt8(offset, array[i]);
+            offset++;
+        }
+        return length + 1;
+    }
+    static writeUint16Array(dataView, offset, array = []) {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setUint16(offset, array[i]);
+            offset += 2;
+        }
+        return length * 2 + 1;
+    }
+    static writeInt16Array(dataView, offset, array = []) {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setInt16(offset, array[i]);
+            offset += 2;
+        }
+        return length * 2 + 1;
+    }
+    static writeInt32Array(dataView, offset, array = []) {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setInt32(offset, array[i]);
+            offset += 4;
+        }
+        return length * 4 + 1;
+    }
+    static writeFloat32Array(dataView, offset, array = []) {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setFloat32(offset, array[i]);
+            offset += 4;
+        }
+        return length * 4 + 1;
+    }
+    static writeFloat64Array(dataView, offset, array = []) {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setFloat64(offset, array[i]);
+            offset += 8;
+        }
+        return length * 8 + 1;
+    }
     /**
      * 内部类
      * @param dataView
@@ -391,21 +461,56 @@ class Buffer {
                 return Buffer.GetObjectLength(value);
             case ByteType.String:
                 return Buffer.getStringLength(value);
-            //数组
+            //数组  number 如果数组为空 则 需要一bit 做标志位 
             case ByteType.UInt8Array:
-                return 1 * value.length;
+                {
+                    if (value == null)
+                        return 1;
+                    let length = value.length;
+                    return length == 0 ? 1 : length;
+                }
             case ByteType.Int8Array:
-                return 1 * value.length;
+                {
+                    if (value == null)
+                        return 1;
+                    let length = value.length;
+                    return length == 0 ? 1 : length;
+                }
             case ByteType.Uint16Array:
-                return 2 * value.length;
+                {
+                    if (value == null)
+                        return 1;
+                    let length = value.length;
+                    return length == 0 ? 1 : length * 2;
+                }
             case ByteType.Int16Array:
-                return 2 * value.length;
+                {
+                    if (value == null)
+                        return 1;
+                    let length = value.length;
+                    return length == 0 ? 1 : length * 2;
+                }
             case ByteType.Int32Array:
-                return 4 * value.length;
+                {
+                    if (value == null)
+                        return 1;
+                    let length = value.length;
+                    return length == 0 ? 1 : length * 4;
+                }
             case ByteType.Float32Array:
-                return 4 * value.length;
+                {
+                    if (value == null)
+                        return 1;
+                    let length = value.length;
+                    return length == 0 ? 1 : length * 4;
+                }
             case ByteType.Float64Array:
-                return 8 * value.length;
+                {
+                    if (value == null)
+                        return 1;
+                    let length = value.length;
+                    return length == 0 ? 1 : length * 8;
+                }
             case ByteType.ObjectArray:
                 return Buffer.getObjectArrayLength(value);
             case ByteType.StringArray:
@@ -418,14 +523,14 @@ class Buffer {
     static getStringArrayLength(strArray) {
         var length = 0;
         for (var i = 0; i < strArray.length; i++) {
-            length += this.getStringLength(strArray[i]);
+            length += Buffer.getStringLength(strArray[i]);
         }
         return length;
     }
     static getObjectArrayLength(objArray) {
         var length = 0;
         for (var i = 0; i < objArray.length; i++) {
-            length += this.GetObjectLength(objArray[i]);
+            length += Buffer.GetObjectLength(objArray[i]);
         }
         return length;
     }
