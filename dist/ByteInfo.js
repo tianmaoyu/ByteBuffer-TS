@@ -286,7 +286,7 @@ class Buffer {
             dataView.setUint8(offset, array[i]);
             offset++;
         }
-        return length + 1;
+        return arrayLength + 1;
     }
     static writeInt8Array(dataView, offset, array = []) {
         var arrayLength = array.length;
@@ -296,7 +296,7 @@ class Buffer {
             dataView.setInt8(offset, array[i]);
             offset++;
         }
-        return length + 1;
+        return arrayLength + 1;
     }
     static writeUint16Array(dataView, offset, array = []) {
         var arrayLength = array.length;
@@ -306,7 +306,7 @@ class Buffer {
             dataView.setUint16(offset, array[i]);
             offset += 2;
         }
-        return length * 2 + 1;
+        return arrayLength * 2 + 1;
     }
     static writeInt16Array(dataView, offset, array = []) {
         var arrayLength = array.length;
@@ -316,7 +316,7 @@ class Buffer {
             dataView.setInt16(offset, array[i]);
             offset += 2;
         }
-        return length * 2 + 1;
+        return arrayLength * 2 + 1;
     }
     static writeInt32Array(dataView, offset, array = []) {
         var arrayLength = array.length;
@@ -326,7 +326,7 @@ class Buffer {
             dataView.setInt32(offset, array[i]);
             offset += 4;
         }
-        return length * 4 + 1;
+        return arrayLength * 4 + 1;
     }
     static writeFloat32Array(dataView, offset, array = []) {
         var arrayLength = array.length;
@@ -336,7 +336,7 @@ class Buffer {
             dataView.setFloat32(offset, array[i]);
             offset += 4;
         }
-        return length * 4 + 1;
+        return arrayLength * 4 + 1;
     }
     static writeFloat64Array(dataView, offset, array = []) {
         var arrayLength = array.length;
@@ -346,7 +346,7 @@ class Buffer {
             dataView.setFloat64(offset, array[i]);
             offset += 8;
         }
-        return length * 8 + 1;
+        return arrayLength * 8 + 1;
     }
     /**
      * 内部类
