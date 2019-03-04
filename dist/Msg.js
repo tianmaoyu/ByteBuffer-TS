@@ -53,24 +53,38 @@ let Msg = class Msg {
      */
     constructor() {
         this.MessageType = Message_1.MessageType.msg1;
-        // @ByteMember(2, ByteType.Uint16)
-        // public Id: number = 0;
-        // @ByteMember(3, ByteType.Uint8)
-        // public Bool: boolean = false;
-        // @ByteMember(4, ByteType.String)
-        // public Name: string = "";
-        // @ByteMember(5, ByteType.String)
-        // public Address: string = "";
+        this.Id = 0;
+        this.Bool = false;
+        this.Name = "";
+        this.Address = "";
         this.User = undefined;
         // @ByteMember(7, ByteType.UInt8Array)
         // public IdList: number[] = [];
         this.UserList = undefined;
+        this.IdList = [];
+        this.IdList2 = [];
     }
 };
 __decorate([
     ByteInfo_1.ByteMember(1, ByteInfo_1.ByteType.Uint8),
     __metadata("design:type", Number)
 ], Msg.prototype, "MessageType", void 0);
+__decorate([
+    ByteInfo_1.ByteMember(2, ByteInfo_1.ByteType.Uint16),
+    __metadata("design:type", Number)
+], Msg.prototype, "Id", void 0);
+__decorate([
+    ByteInfo_1.ByteMember(3, ByteInfo_1.ByteType.Uint8),
+    __metadata("design:type", Boolean)
+], Msg.prototype, "Bool", void 0);
+__decorate([
+    ByteInfo_1.ByteMember(4, ByteInfo_1.ByteType.String),
+    __metadata("design:type", String)
+], Msg.prototype, "Name", void 0);
+__decorate([
+    ByteInfo_1.ByteMember(5, ByteInfo_1.ByteType.String),
+    __metadata("design:type", String)
+], Msg.prototype, "Address", void 0);
 __decorate([
     ByteInfo_1.ByteMember(6, ByteInfo_1.ByteType.Object, User),
     __metadata("design:type", User)
@@ -79,6 +93,14 @@ __decorate([
     ByteInfo_1.ByteMember(6, ByteInfo_1.ByteType.ObjectArray, User),
     __metadata("design:type", Array)
 ], Msg.prototype, "UserList", void 0);
+__decorate([
+    ByteInfo_1.ByteMember(7, ByteInfo_1.ByteType.Int32Array),
+    __metadata("design:type", Array)
+], Msg.prototype, "IdList", void 0);
+__decorate([
+    ByteInfo_1.ByteMember(8, ByteInfo_1.ByteType.Int32Array),
+    __metadata("design:type", Array)
+], Msg.prototype, "IdList2", void 0);
 Msg = __decorate([
     ByteInfo_1.BtyeContract
 ], Msg);

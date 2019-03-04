@@ -28,17 +28,17 @@ export class Msg {
     @ByteMember(1, ByteType.Uint8)
     public MessageType: MessageType = MessageType.msg1;
 
-    // @ByteMember(2, ByteType.Uint16)
-    // public Id: number = 0;
+    @ByteMember(2, ByteType.Uint16)
+    public Id: number = 0;
 
-    // @ByteMember(3, ByteType.Uint8)
-    // public Bool: boolean = false;
+    @ByteMember(3, ByteType.Uint8)
+    public Bool: boolean = false;
 
-    // @ByteMember(4, ByteType.String)
-    // public Name: string = "";
+    @ByteMember(4, ByteType.String)
+    public Name: string = "";
 
-    // @ByteMember(5, ByteType.String)
-    // public Address: string = "";
+    @ByteMember(5, ByteType.String)
+    public Address: string = "";
 
     @ByteMember(6, ByteType.Object,User)
     public User: User=undefined;
@@ -49,5 +49,9 @@ export class Msg {
     @ByteMember(6, ByteType.ObjectArray,User)
     public UserList: User[]=undefined;
 
+    @ByteMember(7, ByteType.Int32Array)
+    public IdList: number[]=[];
+    @ByteMember(8, ByteType.Int32Array)
+    public IdList2: number[]=[];
 }
 

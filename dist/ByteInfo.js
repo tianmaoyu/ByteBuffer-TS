@@ -124,54 +124,54 @@ class Buffer {
         return length + 1;
     }
     static readUint16Array(dataView, offset, object, propertyKey) {
-        var length = dataView.getUint8(offset);
+        var lengthArray = dataView.getUint8(offset);
         offset += 1;
         var array = [];
-        for (var i = 0; i < length / 2; i++, offset += 2) {
+        for (var i = 0; i < lengthArray; i++, offset += 2) {
             array.push(dataView.getUint16(offset));
         }
         object[propertyKey] = array;
-        return length + 1;
+        return lengthArray * 2 + 1;
     }
     static readInt16Array(dataView, offset, object, propertyKey) {
-        var length = dataView.getUint8(offset);
+        var lengthArray = dataView.getUint8(offset);
         offset += 1;
         var array = [];
-        for (var i = 0; i < length / 2; i++, offset += 2) {
+        for (var i = 0; i < lengthArray; i++, offset += 2) {
             array.push(dataView.getInt16(offset));
         }
         object[propertyKey] = array;
-        return length + 1;
+        return lengthArray * 2 + 1;
     }
     static readInt32Array(dataView, offset, object, propertyKey) {
-        var length = dataView.getUint8(offset);
+        var lengthArray = dataView.getUint8(offset);
         offset += 1;
         var array = [];
-        for (var i = 0; i < length / 4; i++, offset += 4) {
+        for (var i = 0; i < lengthArray; i++, offset += 4) {
             array.push(dataView.getInt32(offset));
         }
         object[propertyKey] = array;
-        return length + 1;
+        return lengthArray * 4 + 1;
     }
     static readFloat32Array(dataView, offset, object, propertyKey) {
-        var length = dataView.getUint8(offset);
+        var lengthArray = dataView.getUint8(offset);
         offset += 1;
         var array = [];
-        for (var i = 0; i < length / 4; i++, offset += 4) {
+        for (var i = 0; i < lengthArray; i++, offset += 4) {
             array.push(dataView.getFloat32(offset));
         }
         object[propertyKey] = array;
-        return length + 1;
+        return lengthArray * 4 + 1;
     }
     static readFloat64Array(dataView, offset, object, propertyKey) {
-        var length = dataView.getUint8(offset);
+        var lengthArray = dataView.getUint8(offset);
         offset += 1;
         var array = [];
-        for (var i = 0; i < length / 8; i++, offset += 8) {
+        for (var i = 0; i < lengthArray; i++, offset += 8) {
             array.push(dataView.getFloat64(offset));
         }
         object[propertyKey] = array;
-        return length + 1;
+        return lengthArray * 8 + 1;
     }
     static readStringArray(dataView, offset, object, propertyKey) {
         var totalLength = 0; //数组所占的长度
