@@ -1,5 +1,5 @@
 import { Msg } from "./Msg";
-
+import "reflect-metadata";
 
 const Map1: { [key: string]: number; } = {};
 
@@ -478,7 +478,7 @@ export class Buffer {
         for (var key in obj) {
             var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
             if (byteInfo === undefined) continue;
-            var propertyLength = this.getPropertyLength(byteInfo.Type, obj[key]);
+            var propertyLength = this.getPropertyByteLength(byteInfo.Type, obj[key]);
             objectLength += propertyLength;
         }
         return objectLength;
@@ -491,7 +491,7 @@ export class Buffer {
      * @param type 
      * @param value 
      */
-    private static getPropertyLength(type: ByteType, value: string | object | []): number {
+    private static getPropertyByteLength(type: ByteType, value: string | object | []): number {
         switch (type) {
             case ByteType.Uint8:
                 return 1;
@@ -517,43 +517,43 @@ export class Buffer {
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length;
+                    return length == 0 ? 1 : length+1;
                 }
             case ByteType.Int8Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length;
+                    return length == 0 ? 1 : length+1;
                 }
             case ByteType.Uint16Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 2;
+                    return length == 0 ? 1 : length * 2 +1;
                 }
             case ByteType.Int16Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 2;
+                    return length == 0 ? 1 : length * 2 +1;
                 }
             case ByteType.Int32Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 4;
+                    return length == 0 ? 1 : length * 4+1;
                 }
             case ByteType.Float32Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 4;
+                    return length == 0 ? 1 : length * 4+1;
                 }
             case ByteType.Float64Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 8;
+                    return length == 0 ? 1 : length * 8 +1;
                 }
             case ByteType.ObjectArray:
                 return Buffer.getObjectArrayLength(value as Array<object>)
@@ -564,7 +564,7 @@ export class Buffer {
     }
 
     private static getStringLength(str: string): number {
-        return str.length * 2 + 1;// 长度的 2 倍 ， 并用一位标识 长度
+        return str.length * 2+1 ;//
     }
 
     private static getStringArrayLength(strArray: Array<string>): number {
@@ -572,7 +572,7 @@ export class Buffer {
         for (var i = 0; i < strArray.length; i++) {
             length += Buffer.getStringLength(strArray[i]);
         }
-        return length;
+        return length+1;
     }
 
     private static getObjectArrayLength(objArray: Array<object>) {
@@ -580,7 +580,7 @@ export class Buffer {
         for (var i = 0; i < objArray.length; i++) {
             length += Buffer.GetObjectLength(objArray[i]);
         }
-        return length;
+        return length+1;
     }
     //#endregion
 }
