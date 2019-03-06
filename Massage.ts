@@ -2,18 +2,18 @@ import { ByteMember, ByteType, BtyeContract } from './ByteInfo';
 
 
 export enum MessageType {
-    msg1 = 1,
-    msg2 = 2,
+    join = 1,
+    move = 2,
 }
 
 @BtyeContract
 export class User {
     @ByteMember(1, ByteType.Uint16)
-    public Id: number = undefined;
+    public Id: number ;
     @ByteMember(2, ByteType.String)
-    public Name: String = undefined;
+    public Name: String ;
     @ByteMember(3, ByteType.Int32Array)
-    public IdList: number[] = []
+    public IdList: number[];
 }
 
 /**测试 */
@@ -32,30 +32,30 @@ export class Role {
 export class Msg {
 
     @ByteMember(1, ByteType.Uint8)
-    public MessageType: MessageType = MessageType.msg1;
+    public MessageType: MessageType = MessageType.join;
 
     @ByteMember(2, ByteType.Uint16)
     public Id: number = 0;
 
     @ByteMember(3, ByteType.Uint8)
-    public Bool: boolean = false;
+    public Bool: boolean;
 
     @ByteMember(4, ByteType.String)
-    public Name: string = "";
+    public Name: string;
 
     @ByteMember(5, ByteType.String)
-    public Address: string = "";
+    public Address: string ;
 
     @ByteMember(6, ByteType.Object, User)
-    public User: User = undefined;
+    public User: User ;
 
     @ByteMember(7, ByteType.UInt8Array)
-    public IdList: number[] = [];
+    public IdList: number[];
    
     @ByteMember(8, ByteType.Int32Array)
-    public IdList2: number[]=[];
+    public IdList2: number[];
 
     @ByteMember(9, ByteType.ObjectArray, User)
-    public UserList:Array<User>=[];
+    public UserList:Array<User>;
 }
 

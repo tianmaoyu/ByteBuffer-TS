@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
-/**byte 类型
- * 要写入的
+/**
+ * 要写入的 byte 类型
  */
 class ByteInfo {
     constructor(propertyKey, order, type, fun = null) {
@@ -14,7 +14,7 @@ class ByteInfo {
 }
 exports.ByteInfo = ByteInfo;
 class Buffer {
-    //#region read method
+    //#region  read method
     /**
      * 从 buffer 中反射 出 一个 classType 实例
      * @param classType
@@ -31,6 +31,13 @@ class Buffer {
             offSet += byteLength;
         }
         return object;
+        // for (var propertyKey in object) {
+        //     var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", object, propertyKey);
+        //     if (byteInfo === undefined) continue;
+        //     var propertyLength = this.readProperty(dataView, offSet, byteInfo, object, propertyKey);
+        //     offSet += propertyLength;
+        // }
+        // return object;
     }
     static readProperty(dataView, offSet, byteInfo, object, propertyKey) {
         var type = byteInfo.Type;
@@ -233,6 +240,14 @@ class Buffer {
         }
         var buffer = catheBuffer.slice(0, offSet);
         return buffer;
+        // for (var key in obj) {
+        //     var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
+        //     if (byteInfo === undefined) continue;
+        //     var propertyLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[key]);
+        //     offSet += propertyLength;
+        // }
+        // var buffer = catheBuffer.slice(0, offSet);
+        // return buffer;
     }
     /**
     * 把属性 Property 写入 二进制，并返回写入了的长度
@@ -374,6 +389,13 @@ class Buffer {
             offSet += byteLength;
         }
         return totalLength + 1;
+        // for (var key in obj) {
+        //     var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
+        //     if (byteInfo === undefined) continue;
+        //     var propertyLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[key]);
+        //     offSet += propertyLength;
+        // }
+        // return totalLength + 1;
     }
     /**
      * 内部类 array
@@ -427,7 +449,7 @@ class Buffer {
         return totalLength + 1;
     }
     //#endregion
-    //#region length method
+    //#region  length method  
     /**
      * 得到 object 对象 二进制 长度
      * @param obj
@@ -444,6 +466,13 @@ class Buffer {
             objectLength += byteLength;
         }
         return objectLength;
+        // for (var key in obj) {
+        //     var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
+        //     if (byteInfo === undefined) continue;
+        //     var propertyLength = this.getPropertyByteLength(byteInfo.Type, obj[key]);
+        //     objectLength += propertyLength;
+        // }
+        // return objectLength;
     }
     /**
      * 得到 属性 二进制 长度
@@ -554,8 +583,8 @@ Buffer.ClassMap = new Map();
  */
 Buffer.ClassInfoMap = new Map();
 exports.Buffer = Buffer;
-/**属性修饰
- * ByteMember
+/**
+ * ByteMember 属性修饰
  * @param order
  * @param type
  */
@@ -575,15 +604,16 @@ function ByteMember(order, type, fun = null) {
     };
 }
 exports.ByteMember = ByteMember;
-/**类修饰
+/**
+ * 类修饰
  * 需要序列化的类的 标识
  */
 function BtyeContract(target) {
     Buffer.ClassMap.set(target.name, target);
 }
 exports.BtyeContract = BtyeContract;
-/**枚举类型
- *Byte Type
+/**
+ *Byte Type 枚举类型
  */
 var ByteType;
 (function (ByteType) {
@@ -611,4 +641,4 @@ var ByteType;
     ByteType[ByteType["StringArray"] = 29] = "StringArray";
     ByteType[ByteType["ObjectArray"] = 30] = "ObjectArray";
 })(ByteType = exports.ByteType || (exports.ByteType = {}));
-//# sourceMappingURL=ByteInfo.js.map
+//# sourceMappingURL=ByteInfo2.js.map

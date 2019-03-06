@@ -1,20 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
-/**byte 类型
- * 要写入的
- */
-class ByteInfo {
-    constructor(propertyKey, order, type, fun = null) {
-        this.PropertyKey = propertyKey;
-        this.Order = order;
-        this.Type = type;
-        this.Function = fun;
-    }
-}
-exports.ByteInfo = ByteInfo;
+const Map1 = {};
+const classPool = [];
 class Buffer {
-    //#region read method
+    //#region  read method
     /**
      * 从 buffer 中反射 出 一个 classType 实例
      * @param classType
@@ -22,13 +12,14 @@ class Buffer {
      */
     static ReadObject(classType, buffer) {
         var offSet = 0;
-        var object = new classType.prototype.constructor();
+        var object = new classType();
         var dataView = new DataView(buffer);
-        var byteInfoArray = Buffer.ClassInfoMap.get(classType.name);
-        for (let i = 0; i < byteInfoArray.length; i++) {
-            let byteInfo = byteInfoArray[i];
-            let byteLength = this.readProperty(dataView, offSet, byteInfo, object, byteInfo.PropertyKey);
-            offSet += byteLength;
+        for (var propertyKey in object) {
+            var byteInfo = Reflect.getMetadata("ByteMember", object, propertyKey);
+            if (byteInfo === undefined)
+                continue;
+            var propertyLength = this.readProperty(dataView, offSet, byteInfo, object, propertyKey);
+            offSet += propertyLength;
         }
         return object;
     }
@@ -225,11 +216,12 @@ class Buffer {
         var offSet = 0;
         var catheBuffer = new ArrayBuffer(128);
         var dataView = new DataView(catheBuffer);
-        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
-        for (let i = 0; i < byteInfoArray.length; i++) {
-            let byteInfo = byteInfoArray[i];
-            let byteLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[byteInfo.PropertyKey]);
-            offSet += byteLength;
+        for (var key in obj) {
+            var byteInfo = Reflect.getMetadata("ByteMember", obj, key);
+            if (byteInfo === undefined)
+                continue;
+            var propertyLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[key]);
+            offSet += propertyLength;
         }
         var buffer = catheBuffer.slice(0, offSet);
         return buffer;
@@ -367,11 +359,12 @@ class Buffer {
         var totalLength = Buffer.GetObjectByteLength(obj);
         dataView.setUint8(offSet, totalLength);
         offSet++;
-        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
-        for (let i = 0; i < byteInfoArray.length; i++) {
-            let byteInfo = byteInfoArray[i];
-            let byteLength = Buffer.writeProperty(dataView, offSet, byteInfo.Type, obj[byteInfo.PropertyKey]);
-            offSet += byteLength;
+        for (var key in obj) {
+            var byteInfo = Reflect.getMetadata("ByteMember", obj, key);
+            if (byteInfo === undefined)
+                continue;
+            var propertyLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[key]);
+            offSet += propertyLength;
         }
         return totalLength + 1;
     }
@@ -427,7 +420,7 @@ class Buffer {
         return totalLength + 1;
     }
     //#endregion
-    //#region length method
+    //#region  length method  
     /**
      * 得到 object 对象 二进制 长度
      * @param obj
@@ -437,11 +430,12 @@ class Buffer {
         if (obj === null || obj === undefined) {
             return objectLength;
         }
-        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
-        for (let i = 0; i < byteInfoArray.length; i++) {
-            let byteInfo = byteInfoArray[i];
-            let byteLength = Buffer.getPropertyByteLength(byteInfo.Type, obj[byteInfo.PropertyKey]);
-            objectLength += byteLength;
+        for (var key in obj) {
+            var byteInfo = Reflect.getMetadata("ByteMember", obj, key);
+            if (byteInfo === undefined)
+                continue;
+            var propertyLength = this.getPropertyByteLength(byteInfo.Type, obj[key]);
+            objectLength += propertyLength;
         }
         return objectLength;
     }
@@ -545,49 +539,62 @@ class Buffer {
         return length + 1;
     }
 }
-/**
- * 名称与构造器
- */
-Buffer.ClassMap = new Map();
-/**
- * 名称与属性
- */
-Buffer.ClassInfoMap = new Map();
 exports.Buffer = Buffer;
-/**属性修饰
- * ByteMember
+/**
+ * ByteMember 属性修饰
  * @param order
  * @param type
+ * @param fun
  */
 function ByteMember(order, type, fun = null) {
     return function (target, propertyKey) {
-        var byteInfo = new ByteInfo(propertyKey, order, type, fun);
-        var byteInfoArray = Buffer.ClassInfoMap.get(target.constructor.name);
-        if (!byteInfoArray) {
-            byteInfoArray = Array();
-            byteInfoArray.push(byteInfo);
-            Buffer.ClassInfoMap.set(target.constructor.name, byteInfoArray);
-        }
-        else {
-            byteInfoArray.push(byteInfo);
-            byteInfoArray.sort((a, b) => a.Order - b.Order); //排序
-        }
+        console.log("I am 属性 decorator");
+        console.info(typeof target);
+        console.info(`属性值:${propertyKey} 类名为:${target.constructor.name}`);
     };
+    //return Reflect.metadata("ByteMember", new ByteInfo(order, type, fun));
 }
 exports.ByteMember = ByteMember;
-/**类修饰
+/**
+ * 类修饰
  * 需要序列化的类的 标识
  */
 function BtyeContract(target) {
-    Buffer.ClassMap.set(target.name, target);
+    // return function (target: Function) {
+    //     target.prototype.className = className;
+    //     Buffer.BufferClassPool.set(target.name, target)
+    //     Buffer.ClassTypeMap[className] = target;
+    //     console.info("I am 类 decorator")
+    // };
 }
 exports.BtyeContract = BtyeContract;
-/**枚举类型
- *Byte Type
+/**
+ *
+ * @param className 函数柯里化解决参数问题
+ */
+function ByteClass(className) {
+    return function (target) {
+        target.prototype.className = className;
+        console.info("I am 类 decorator");
+    };
+}
+exports.ByteClass = ByteClass;
+/**
+ * 要写入的 byte 类型
+ */
+class ByteInfo {
+    constructor(order, type, fun = null) {
+        this.Order = order;
+        this.Type = type;
+        this.Function = fun;
+    }
+}
+exports.ByteInfo = ByteInfo;
+/**
+ *Byte Type 枚举类型
  */
 var ByteType;
 (function (ByteType) {
-    ByteType[ByteType["Bool"] = 11] = "Bool";
     ByteType[ByteType["Int8"] = 1] = "Int8";
     ByteType[ByteType["Uint8"] = 2] = "Uint8";
     ByteType[ByteType["Int16"] = 3] = "Int16";
@@ -599,16 +606,15 @@ var ByteType;
     ByteType[ByteType["String"] = 9] = "String";
     ByteType[ByteType["Object"] = 10] = "Object";
     //数组
-    ByteType[ByteType["BoolArray"] = 19] = "BoolArray";
-    ByteType[ByteType["Int8Array"] = 20] = "Int8Array";
-    ByteType[ByteType["UInt8Array"] = 21] = "UInt8Array";
-    ByteType[ByteType["Int16Array"] = 23] = "Int16Array";
-    ByteType[ByteType["Uint16Array"] = 24] = "Uint16Array";
-    ByteType[ByteType["Int32Array"] = 25] = "Int32Array";
-    ByteType[ByteType["Uint32Array"] = 26] = "Uint32Array";
-    ByteType[ByteType["Float32Array"] = 27] = "Float32Array";
-    ByteType[ByteType["Float64Array"] = 28] = "Float64Array";
-    ByteType[ByteType["StringArray"] = 29] = "StringArray";
-    ByteType[ByteType["ObjectArray"] = 30] = "ObjectArray";
+    ByteType[ByteType["Int8Array"] = 10] = "Int8Array";
+    ByteType[ByteType["UInt8Array"] = 11] = "UInt8Array";
+    ByteType[ByteType["Int16Array"] = 13] = "Int16Array";
+    ByteType[ByteType["Uint16Array"] = 14] = "Uint16Array";
+    ByteType[ByteType["Int32Array"] = 15] = "Int32Array";
+    ByteType[ByteType["Uint32Array"] = 16] = "Uint32Array";
+    ByteType[ByteType["Float32Array"] = 17] = "Float32Array";
+    ByteType[ByteType["Float64Array"] = 18] = "Float64Array";
+    ByteType[ByteType["StringArray"] = 19] = "StringArray";
+    ByteType[ByteType["ObjectArray"] = 20] = "ObjectArray";
 })(ByteType = exports.ByteType || (exports.ByteType = {}));
-//# sourceMappingURL=ByteInfo.js.map
+//# sourceMappingURL=ByteInfo.1.js.map

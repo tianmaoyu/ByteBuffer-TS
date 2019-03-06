@@ -1,29 +1,48 @@
-import { Msg } from "./Massage";
 import "reflect-metadata";
 
-const Map1: { [key: string]: number; } = {};
-
-const classPool: Array<Function> = [];
-
-
+/**byte 类型
+ * 要写入的 
+ */
+export class ByteInfo {
+    public Order: number;
+    public Type: ByteType;
+    public Function: Function;
+    public PropertyKey:string;
+    constructor(propertyKey:string,order: number, type: ByteType, fun: Function = null) {
+        this.PropertyKey=propertyKey;
+        this.Order = order;
+        this.Type = type;
+        this.Function = fun;
+    }
+}
 
 export class Buffer {
 
-    //#region  read method
+    /**
+     * 名称与构造器
+     */
+    public static ClassMap = new Map<string, Function>();
+
+    /**
+     * 名称与属性
+     */
+    public static ClassInfoMap = new Map<string, Array<ByteInfo>>();
+
+    //#region read method
     /**
      * 从 buffer 中反射 出 一个 classType 实例
      * @param classType 
      * @param buffer 
      */
-    public static ReadObject<T>(classType: any, buffer: ArrayBuffer): T {
+    public static ReadObject<T>(classType: Function, buffer: ArrayBuffer): T {
         var offSet = 0;
-        var object = new classType();
+        var object = new classType.prototype.constructor();
         var dataView = new DataView(buffer);
-        for (var propertyKey in object) {
-            var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", object, propertyKey);
-            if (byteInfo === undefined) continue;
-            var propertyLength = this.readProperty(dataView, offSet, byteInfo, object, propertyKey);
-            offSet += propertyLength;
+        var byteInfoArray=  Buffer.ClassInfoMap.get(classType.name);
+        for(let i=0;i<byteInfoArray.length;i++){
+            let byteInfo=byteInfoArray[i];
+            let byteLength = this.readProperty(dataView, offSet, byteInfo, object, byteInfo.PropertyKey);
+            offSet+=byteLength;
         }
         return object;
     }
@@ -89,7 +108,7 @@ export class Buffer {
             object[propertyKey] = null;
             return length + 1;
         }
-        let objectBuffer = dataView.buffer.slice(offset, length+offset);
+        let objectBuffer = dataView.buffer.slice(offset, length + offset);
         object[propertyKey] = Buffer.ReadObject(byteInfo.Function, objectBuffer);
         return length + 1;
     }
@@ -108,10 +127,10 @@ export class Buffer {
                 arrayObject.push(null);
                 continue;
             }
-            let objectBuffer = dataView.buffer.slice(offset, length+offset);
+            let objectBuffer = dataView.buffer.slice(offset, length + offset);
             var obj = Buffer.ReadObject(byteInfo.Function, objectBuffer);
             arrayObject.push(obj);
-            offset+=length;
+            offset += length;
         }
         object[propertyKey] = arrayObject;
         return totalLength + 1;
@@ -148,7 +167,7 @@ export class Buffer {
             array.push(dataView.getUint16(offset));
         }
         object[propertyKey] = array;
-        return lengthArray*2 + 1;
+        return lengthArray * 2 + 1;
     }
 
     private static readInt16Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
@@ -159,7 +178,7 @@ export class Buffer {
             array.push(dataView.getInt16(offset));
         }
         object[propertyKey] = array;
-        return lengthArray*2 + 1;
+        return lengthArray * 2 + 1;
     }
 
     private static readInt32Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
@@ -170,18 +189,18 @@ export class Buffer {
             array.push(dataView.getInt32(offset));
         }
         object[propertyKey] = array;
-        return lengthArray*4 + 1;
+        return lengthArray * 4 + 1;
     }
 
     private static readFloat32Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
         var lengthArray = dataView.getUint8(offset);
         offset += 1;
         var array = [];
-        for (var i = 0; i < lengthArray ; i++ , offset += 4) {
+        for (var i = 0; i < lengthArray; i++ , offset += 4) {
             array.push(dataView.getFloat32(offset));
         }
         object[propertyKey] = array;
-        return lengthArray*4 + 1;
+        return lengthArray * 4 + 1;
     }
 
     private static readFloat64Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
@@ -192,7 +211,7 @@ export class Buffer {
             array.push(dataView.getFloat64(offset));
         }
         object[propertyKey] = array;
-        return lengthArray*8 + 1;
+        return lengthArray * 8 + 1;
     }
 
 
@@ -244,11 +263,11 @@ export class Buffer {
         var offSet = 0;
         var catheBuffer = new ArrayBuffer(128);
         var dataView = new DataView(catheBuffer);
-        for (var key in obj) {
-            var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
-            if (byteInfo === undefined) continue;
-            var propertyLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[key]);
-            offSet += propertyLength;
+        var byteInfoArray=  Buffer.ClassInfoMap.get(obj.constructor.name);
+        for(let i=0;i<byteInfoArray.length;i++){
+            let byteInfo=byteInfoArray[i];
+            let byteLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[byteInfo.PropertyKey]);
+            offSet += byteLength;
         }
         var buffer = catheBuffer.slice(0, offSet);
         return buffer;
@@ -313,81 +332,81 @@ export class Buffer {
     }
 
 
-    private static writeUint8Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
-        var arrayLength=array.length;
-        dataView.setUint8(offset,arrayLength);
+    private static writeUint8Array(dataView: DataView, offset: number, array: Array<number> = []): number {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setUint8(offset,array[i]);
+            dataView.setUint8(offset, array[i]);
             offset++;
         }
         return arrayLength + 1;
     }
 
-    private static writeInt8Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
-        var arrayLength=array.length;
-        dataView.setUint8(offset,arrayLength);
+    private static writeInt8Array(dataView: DataView, offset: number, array: Array<number> = []): number {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setInt8(offset,array[i]);
+            dataView.setInt8(offset, array[i]);
             offset++;
         }
         return arrayLength + 1;
     }
 
-    private static writeUint16Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
-        var arrayLength=array.length;
-        dataView.setUint8(offset,arrayLength);
+    private static writeUint16Array(dataView: DataView, offset: number, array: Array<number> = []): number {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setUint16(offset,array[i]);
-            offset+=2;
+            dataView.setUint16(offset, array[i]);
+            offset += 2;
         }
-        return arrayLength*2 + 1;
+        return arrayLength * 2 + 1;
     }
 
-    private static writeInt16Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
-        var arrayLength=array.length;
-        dataView.setUint8(offset,arrayLength);
+    private static writeInt16Array(dataView: DataView, offset: number, array: Array<number> = []): number {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setInt16(offset,array[i]);
-            offset+=2;
+            dataView.setInt16(offset, array[i]);
+            offset += 2;
         }
-        return arrayLength*2 + 1;
+        return arrayLength * 2 + 1;
     }
 
-    private static writeInt32Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
-        var arrayLength=array.length;
-        dataView.setUint8(offset,arrayLength);
+    private static writeInt32Array(dataView: DataView, offset: number, array: Array<number> = []): number {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setInt32(offset,array[i]);
-            offset+=4;
+            dataView.setInt32(offset, array[i]);
+            offset += 4;
         }
-        return arrayLength*4 + 1;
+        return arrayLength * 4 + 1;
     }
 
-    private static writeFloat32Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
-        var arrayLength=array.length;
-        dataView.setUint8(offset,arrayLength);
+    private static writeFloat32Array(dataView: DataView, offset: number, array: Array<number> = []): number {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setFloat32(offset,array[i]);
-            offset+=4;
+            dataView.setFloat32(offset, array[i]);
+            offset += 4;
         }
-        return arrayLength*4 + 1;
+        return arrayLength * 4 + 1;
     }
 
-    private static writeFloat64Array(dataView: DataView, offset: number,array:Array<number>=[]): number {
-        var arrayLength=array.length;
-        dataView.setUint8(offset,arrayLength);
+    private static writeFloat64Array(dataView: DataView, offset: number, array: Array<number> = []): number {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setFloat64(offset,array[i]);
-            offset+=8;
+            dataView.setFloat64(offset, array[i]);
+            offset += 8;
         }
-        return arrayLength*8 + 1;
+        return arrayLength * 8 + 1;
     }
 
     /**
@@ -400,14 +419,15 @@ export class Buffer {
         var totalLength = Buffer.GetObjectByteLength(obj);
         dataView.setUint8(offSet, totalLength)
         offSet++;
-        for (var key in obj) {
-            var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
-            if (byteInfo === undefined) continue;
-            var propertyLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[key]);
-            offSet += propertyLength;
+        var byteInfoArray=  Buffer.ClassInfoMap.get(obj.constructor.name);
+        for(let i=0;i<byteInfoArray.length;i++){
+            let byteInfo=byteInfoArray[i];
+            let byteLength = Buffer.writeProperty(dataView, offSet, byteInfo.Type, obj[byteInfo.PropertyKey]);
+            offSet += byteLength;
         }
-        return totalLength + 1;
+       return totalLength + 1;
     }
+
     /**
      * 内部类 array
      * @param dataView 
@@ -422,7 +442,7 @@ export class Buffer {
         for (let i = 0; i < arrayLength; i++) {
             let _obj = objArray[i];
             let _objLength = Buffer.wirteInnerObject(dataView, offSet, _obj);
-            offSet+=_objLength;
+            offSet += _objLength;
             totalLength += _objLength;
         }
         return totalLength + 1;
@@ -464,8 +484,7 @@ export class Buffer {
 
     //#endregion
 
-
-    //#region  length method  
+    //#region length method
     /**
      * 得到 object 对象 二进制 长度
      * @param obj 
@@ -475,11 +494,11 @@ export class Buffer {
         if (obj === null || obj === undefined) {
             return objectLength;
         }
-        for (var key in obj) {
-            var byteInfo = <ByteInfo>Reflect.getMetadata("ByteMember", obj, key);
-            if (byteInfo === undefined) continue;
-            var propertyLength = this.getPropertyByteLength(byteInfo.Type, obj[key]);
-            objectLength += propertyLength;
+        var byteInfoArray=  Buffer.ClassInfoMap.get(obj.constructor.name);
+        for(let i=0;i<byteInfoArray.length;i++){
+            let byteInfo=byteInfoArray[i];
+            let byteLength = Buffer.getPropertyByteLength(byteInfo.Type, obj[byteInfo.PropertyKey]);
+            objectLength += byteLength;
         }
         return objectLength;
     }
@@ -518,43 +537,43 @@ export class Buffer {
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length+1;
+                    return length == 0 ? 1 : length + 1;
                 }
             case ByteType.Int8Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length+1;
+                    return length == 0 ? 1 : length + 1;
                 }
             case ByteType.Uint16Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 2 +1;
+                    return length == 0 ? 1 : length * 2 + 1;
                 }
             case ByteType.Int16Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 2 +1;
+                    return length == 0 ? 1 : length * 2 + 1;
                 }
             case ByteType.Int32Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 4+1;
+                    return length == 0 ? 1 : length * 4 + 1;
                 }
             case ByteType.Float32Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 4+1;
+                    return length == 0 ? 1 : length * 4 + 1;
                 }
             case ByteType.Float64Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 8 +1;
+                    return length == 0 ? 1 : length * 8 + 1;
                 }
             case ByteType.ObjectArray:
                 return Buffer.getObjectArrayByteLength(value as Array<object>)
@@ -565,7 +584,7 @@ export class Buffer {
     }
 
     private static getStringByteLength(str: string): number {
-        return str.length * 2+1 ;//
+        return str.length * 2 + 1;//
     }
 
     private static getStringArrayByteLength(strArray: Array<string>): number {
@@ -573,7 +592,7 @@ export class Buffer {
         for (var i = 0; i < strArray.length; i++) {
             length += Buffer.getStringByteLength(strArray[i]);
         }
-        return length+1;
+        return length + 1;
     }
 
     private static getObjectArrayByteLength(objArray: Array<object>) {
@@ -581,46 +600,45 @@ export class Buffer {
         for (var i = 0; i < objArray.length; i++) {
             length += Buffer.GetObjectByteLength(objArray[i]);
         }
-        return length+1;
+        return length + 1;
     }
     //#endregion
 }
 
-/**
- * ByteMember 属性修饰
+/**属性修饰
+ * ByteMember 
  * @param order 
  * @param type 
  */
 export function ByteMember(order: number, type: ByteType, fun: Function = null) {
-    return Reflect.metadata("ByteMember", new ByteInfo(order, type, fun));
+    return function (target: any, propertyKey: string) {
+        var byteInfo = new ByteInfo(propertyKey,order, type, fun)
+        var byteInfoArray = Buffer.ClassInfoMap.get(target.constructor.name);
+        if (!byteInfoArray) {
+            byteInfoArray = Array<ByteInfo>();
+            byteInfoArray.push(byteInfo);
+            Buffer.ClassInfoMap.set(target.constructor.name, byteInfoArray);
+        } else {
+            byteInfoArray.push(byteInfo);
+            byteInfoArray.sort((a, b) => a.Order - b.Order)//排序
+        }
+    }
+    
 }
 
-/**
- * 类修饰
+/**类修饰
  * 需要序列化的类的 标识
  */
 export function BtyeContract(target: any) {
-
+    Buffer.ClassMap.set(target.name, target);
 }
 
-/**
- * 要写入的 byte 类型
- */
-export class ByteInfo {
-    public Order: number;
-    public Type: ByteType;
-    public Function: Function;
-    constructor(order: number, type: ByteType, fun: Function = null) {
-        this.Order = order;
-        this.Type = type;
-        this.Function = fun;
-    }
-}
 
-/**
- *Byte Type 枚举类型
+/**枚举类型
+ *Byte Type 
  */
 export enum ByteType {
+    Bool=11,
     Int8 = 1,
     Uint8 = 2,
     Int16 = 3,
@@ -633,14 +651,15 @@ export enum ByteType {
     Object = 10,
 
     //数组
-    Int8Array = 10,
-    UInt8Array = 11,
-    Int16Array = 13,
-    Uint16Array = 14,
-    Int32Array = 15,
-    Uint32Array = 16,
-    Float32Array = 17,
-    Float64Array = 18,
-    StringArray = 19,
-    ObjectArray = 20,
+    BoolArray=19,
+    Int8Array = 20,
+    UInt8Array = 21,
+    Int16Array = 23,
+    Uint16Array = 24,
+    Int32Array = 25,
+    Uint32Array = 26,
+    Float32Array = 27,
+    Float64Array = 28,
+    StringArray = 29,
+    ObjectArray = 30,
 }

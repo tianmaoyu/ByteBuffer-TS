@@ -2,9 +2,9 @@
 import { Msg, User, Role, MessageType } from './Massage';
 import { Buffer } from './ByteInfo';
 
-
+var user2=new User();
 var msg = new Msg();//sss
-msg.MessageType = MessageType.msg1;
+msg.MessageType = MessageType.join;
 msg.Address = "深圳";
 msg.Bool = false;
 msg.Name = "eric";
@@ -14,7 +14,7 @@ user.Id=1;
 user.Name="user"
 user.IdList=[1,2,3,4,5];
 msg.User=user;
-var user2=new User();
+
 user2.Id=2;
 user2.Name="use1";
 msg.UserList=[];
@@ -24,14 +24,13 @@ msg.UserList.push(user);
 msg.IdList=[1,2,3,4];
 msg.IdList2=[1,2,3,4];
 
-
-
 var buffer = Buffer.WirteObject(msg);
 console.info(buffer.byteLength);
 
 console.info(JSON.stringify(msg).length) ;
 var msg1 = Buffer.ReadObject(Msg, buffer);
 console.info(msg1);
+
 var date1_1=new Date().getTime();
 for(let i=0;i<100000;i++){
    let jsonStr= JSON.stringify(msg);
