@@ -1,5 +1,5 @@
 
-import { Msg, User, Role, MessageType } from './Massage_test';
+import { Msg, User, Role, MessageType } from './Massage';
 import { Buffer } from './ByteBuffer';
 
 

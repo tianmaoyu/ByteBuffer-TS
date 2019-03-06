@@ -4,7 +4,7 @@
         "type": "node",
         "request": "launch",
         "name": "启动程序",
-        "program": "${workspaceFolder}/dist/HelloWorld.js", // 需要调试的js代码
+        "program": "${workspaceFolder}/dist/ByteBuffer_test.js", // 需要调试的js代码
         "outFiles": [
             "${workspaceFolder}/**/*.js"
         ]
