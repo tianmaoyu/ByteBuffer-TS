@@ -22,7 +22,7 @@ class Buffer {
      */
     static ReadObject(classType, buffer) {
         var offSet = 0;
-        var object = new classType.prototype.constructor();
+        var object = new classType.prototype.constructor(); //也可以 new (<any>classType())
         var dataView = new DataView(buffer);
         var byteInfoArray = Buffer.ClassInfoMap.get(classType.name);
         for (let i = 0; i < byteInfoArray.length; i++) {
