@@ -1,15 +1,5 @@
 export class UTF8String {
 
-    public static Write(str: string): ArrayBuffer {
-        var buf = new ArrayBuffer(10);
-        return buf
-    }
-
-    public static Read(buf: ArrayBuffer): string {
-        return ""
-    }
-
-
     /**
      * 后台 对应的写法
      * @param string   var bn= BitConverter.GetBytes('n');
@@ -30,22 +20,6 @@ export class UTF8String {
         var str = String.fromCharCode.apply(null, uintArray)
         str = decodeURIComponent(escape(atob(str)))
         return str;
-    }
-
-
-
-    // ArrayBuffer转为字符串，参数为ArrayBuffer对象
-    public static ab2str(buf: ArrayBuffer): string {
-        return String.fromCharCode.apply(null, new Uint16Array(buf));
-    }
-    // 字符串转为ArrayBuffer对象，参数为字符串
-    public static str2ab(str: string): ArrayBuffer {
-        var buf = new ArrayBuffer(str.length * 2); // 每个字符占用2个字节
-        var bufView = new Uint16Array(buf);
-        for (var i = 0, strLen = str.length; i < strLen; i++) {
-            bufView[i] = str.charCodeAt(i);
-        }
-        return buf;
     }
 
 }

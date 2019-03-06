@@ -1,7 +1,7 @@
 
-import { Msg, User, Role } from './Msg';
+import { Msg, User, Role, MessageType } from './Massage';
 import { Buffer } from './ByteInfo';
-import { MessageType } from './Message';
+
 
 var msg = new Msg();//sss
 msg.MessageType = MessageType.msg1;

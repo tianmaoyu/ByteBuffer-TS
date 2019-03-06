@@ -1,6 +1,10 @@
 import { ByteMember, ByteType, BtyeContract } from './ByteInfo';
-import { MessageType } from './Message';
 
+
+export enum MessageType {
+    msg1 = 1,
+    msg2 = 2,
+}
 
 @BtyeContract
 export class User {

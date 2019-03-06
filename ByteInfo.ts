@@ -1,4 +1,4 @@
-import { Msg } from "./Msg";
+import { Msg } from "./Massage";
 import "reflect-metadata";
 
 const Map1: { [key: string]: number; } = {};
