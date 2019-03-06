@@ -41,4 +41,4 @@ for (let i = 0; i < 100000; i++) {
 var time2_2 = new Date().getTime();
 console.info("byteBuffer 耗时间：" + (time2_2 - time2_1));
 console.info("******* ***");
-//# sourceMappingURL=HelloWorld.js.map
+//# sourceMappingURL=Test.js.map

@@ -1,5 +1,6 @@
-import { ByteMember, ByteType, BtyeContract } from './ByteInfo';
 
+
+import { ByteMember, ByteType, BtyeContract } from './ByteBuffer';
 
 export enum MessageType {
     join = 1,
@@ -25,9 +26,7 @@ export class Role {
     public Name: string;
 }
 
-/**
- * 实体需要一个初始值，反射使用
- */
+
 @BtyeContract
 export class Msg {
 

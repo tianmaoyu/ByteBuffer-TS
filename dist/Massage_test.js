@@ -94,4 +94,4 @@ Msg = __decorate([
     ByteBuffer_1.BtyeContract
 ], Msg);
 exports.Msg = Msg;
-//# sourceMappingURL=Massage.js.map
+//# sourceMappingURL=Massage_test.js.map
