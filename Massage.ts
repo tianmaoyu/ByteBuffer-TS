@@ -56,5 +56,10 @@ export class Msg {
 
     @ByteMember(9, ByteType.ObjectArray, User)
     public UserList:Array<User>;
+    @ByteMember(10, ByteType.BoolArray)
+    public BoolList:Array<boolean>;
+
+    @ByteMember(11, ByteType.Bool)
+    public IsVip:boolean;
 }
 

@@ -1,6 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
+// /**
+//  * 字符串编码类型
+//  */
+// enum CharacterEncodingType{
+//     Unicode=1,// 一个字符 2个字节来存储
+//     UTF8=2,// 一个字符 使用 1-3 个字节来存储  
+// }
+// /**
+//  * 配置
+//  */
+// class Config{
+//    /**
+//     * 默认 1个字节 来存储 数组类型，和字符串类型，object 类型 的长度，一个字节存储 0-255
+//     */
+//    public static Array_Length_Max_Byte:number=1;
+//    /**
+//     * 默认 1个字节 来 存储 消息的 类别数，能存储 0-255个
+//     */
+//    public static Message_Type_Count_Max_Byte:number=1;
+//    /**
+//     * 默认 Unicode 字符的编码方式，目前只 实现了 Unicode，UTF8 
+//     */
+//    public static Character_Encoding_Type:CharacterEncodingType=CharacterEncodingType.Unicode;
+// }
 /**byte 类型
  * 要写入的
  */
@@ -35,6 +59,9 @@ class Buffer {
     static readProperty(dataView, offSet, byteInfo, object, propertyKey) {
         var type = byteInfo.Type;
         switch (type) {
+            case ByteType.Bool:
+                object[propertyKey] = dataView.getInt8(offSet) == 1;
+                return 1;
             case ByteType.Uint8:
                 object[propertyKey] = dataView.getUint8(offSet);
                 return 1;
@@ -61,6 +88,8 @@ class Buffer {
             case ByteType.Object:
                 return Buffer.readInnerObject(dataView, offSet, object, propertyKey, byteInfo);
             //array
+            case ByteType.BoolArray:
+                return Buffer.readBoolArray(dataView, offSet, object, propertyKey);
             case ByteType.UInt8Array:
                 return Buffer.readUint8Array(dataView, offSet, object, propertyKey);
             case ByteType.Int8Array:
@@ -112,6 +141,17 @@ class Buffer {
         }
         object[propertyKey] = arrayObject;
         return totalLength + 1;
+    }
+    //readBoolArray
+    static readBoolArray(dataView, offset, object, propertyKey) {
+        var length = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < length; i++, offset++) {
+            array.push(dataView.getInt8(offset) == 1);
+        }
+        object[propertyKey] = array;
+        return length + 1;
     }
     static readUint8Array(dataView, offset, object, propertyKey) {
         var length = dataView.getUint8(offset);
@@ -241,6 +281,9 @@ class Buffer {
     */
     static writeProperty(dataView, offSet, type, value) {
         switch (type) {
+            case ByteType.Bool:
+                dataView.setInt8(offSet, value ? 1 : 0);
+                return 1;
             case ByteType.Uint8:
                 dataView.setUint8(offSet, value);
                 return 1;
@@ -267,6 +310,8 @@ class Buffer {
             case ByteType.String:
                 return Buffer.writeString(dataView, offSet, value);
             //数组
+            case ByteType.BoolArray:
+                return Buffer.writeBoolArray(dataView, offSet, value);
             case ByteType.UInt8Array:
                 return Buffer.writeUint8Array(dataView, offSet, value);
             case ByteType.Int8Array:
@@ -286,6 +331,16 @@ class Buffer {
             case ByteType.StringArray:
                 return Buffer.writeStringArray(dataView, offSet, value);
         }
+    }
+    static writeBoolArray(dataView, offset, array = []) {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setInt8(offset, array[i] ? 1 : 0);
+            offset++;
+        }
+        return arrayLength + 1;
     }
     static writeUint8Array(dataView, offset, array = []) {
         var arrayLength = array.length;
@@ -453,6 +508,8 @@ class Buffer {
      */
     static getPropertyByteLength(type, value) {
         switch (type) {
+            case ByteType.Bool:
+                return 1;
             case ByteType.Uint8:
                 return 1;
             case ByteType.Int8:
@@ -472,6 +529,13 @@ class Buffer {
             case ByteType.String:
                 return Buffer.getStringByteLength(value);
             //数组  number 如果数组为空 则 需要一bit 做标志位 
+            case ByteType.BoolArray:
+                {
+                    if (value == null)
+                        return 1;
+                    let length = value.length;
+                    return length == 0 ? 1 : length + 1;
+                }
             case ByteType.UInt8Array:
                 {
                     if (value == null)

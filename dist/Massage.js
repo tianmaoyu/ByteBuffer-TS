@@ -90,6 +90,14 @@ __decorate([
     ByteBuffer_1.ByteMember(9, ByteBuffer_1.ByteType.ObjectArray, User),
     __metadata("design:type", Array)
 ], Msg.prototype, "UserList", void 0);
+__decorate([
+    ByteBuffer_1.ByteMember(10, ByteBuffer_1.ByteType.BoolArray),
+    __metadata("design:type", Array)
+], Msg.prototype, "BoolList", void 0);
+__decorate([
+    ByteBuffer_1.ByteMember(11, ByteBuffer_1.ByteType.Bool),
+    __metadata("design:type", Boolean)
+], Msg.prototype, "IsVip", void 0);
 Msg = __decorate([
     ByteBuffer_1.BtyeContract
 ], Msg);

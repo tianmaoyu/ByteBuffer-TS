@@ -20,7 +20,8 @@ user2.Name="use1";
 msg.UserList=[];
 msg.UserList.push(user2);
 msg.UserList.push(user);
-
+msg.BoolList=[true,false,true,false];
+msg.IsVip=true;
 msg.IdList=[1,2,3,4];
 msg.IdList2=[1,2,3,4];
 

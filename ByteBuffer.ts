@@ -1,5 +1,34 @@
 import "reflect-metadata";
 
+
+// /**
+//  * 字符串编码类型
+//  */
+// enum CharacterEncodingType{
+//     Unicode=1,// 一个字符 2个字节来存储
+//     UTF8=2,// 一个字符 使用 1-3 个字节来存储  
+// }
+// /**
+//  * 配置
+//  */
+// class Config{
+//    /**
+//     * 默认 1个字节 来存储 数组类型，和字符串类型，object 类型 的长度，一个字节存储 0-255
+//     */
+//    public static Array_Length_Max_Byte:number=1;
+//    /**
+//     * 默认 1个字节 来 存储 消息的 类别数，能存储 0-255个
+//     */
+//    public static Message_Type_Count_Max_Byte:number=1;
+//    /**
+//     * 默认 Unicode 字符的编码方式，目前只 实现了 Unicode，UTF8 
+//     */
+//    public static Character_Encoding_Type:CharacterEncodingType=CharacterEncodingType.Unicode;
+   
+// }
+
+
+
 /**byte 类型
  * 要写入的 
  */
@@ -7,9 +36,9 @@ export class ByteInfo {
     public Order: number;
     public Type: ByteType;
     public Function: Function;
-    public PropertyKey:string;
-    constructor(propertyKey:string,order: number, type: ByteType, fun: Function = null) {
-        this.PropertyKey=propertyKey;
+    public PropertyKey: string;
+    constructor(propertyKey: string, order: number, type: ByteType, fun: Function = null) {
+        this.PropertyKey = propertyKey;
         this.Order = order;
         this.Type = type;
         this.Function = fun;
@@ -38,11 +67,11 @@ export class Buffer {
         var offSet = 0;
         var object = new classType.prototype.constructor();//也可以 new (<any>classType())
         var dataView = new DataView(buffer);
-        var byteInfoArray=  Buffer.ClassInfoMap.get(classType.name);
-        for(let i=0;i<byteInfoArray.length;i++){
-            let byteInfo=byteInfoArray[i];
+        var byteInfoArray = Buffer.ClassInfoMap.get(classType.name);
+        for (let i = 0; i < byteInfoArray.length; i++) {
+            let byteInfo = byteInfoArray[i];
             let byteLength = this.readProperty(dataView, offSet, byteInfo, object, byteInfo.PropertyKey);
-            offSet+=byteLength;
+            offSet += byteLength;
         }
         return object;
     }
@@ -51,6 +80,9 @@ export class Buffer {
     private static readProperty(dataView: DataView, offSet: number, byteInfo: ByteInfo, object: Object, propertyKey: string): number {
         var type = byteInfo.Type;
         switch (type) {
+            case ByteType.Bool:
+                object[propertyKey] = dataView.getInt8(offSet) == 1;
+                return 1;
             case ByteType.Uint8:
                 object[propertyKey] = dataView.getUint8(offSet);
                 return 1;
@@ -78,6 +110,8 @@ export class Buffer {
                 return Buffer.readInnerObject(dataView, offSet, object, propertyKey, byteInfo);
 
             //array
+            case ByteType.BoolArray:
+                return Buffer.readBoolArray(dataView, offSet, object, propertyKey);
             case ByteType.UInt8Array:
                 return Buffer.readUint8Array(dataView, offSet, object, propertyKey);
             case ByteType.Int8Array:
@@ -136,7 +170,17 @@ export class Buffer {
         return totalLength + 1;
     }
 
-
+    //readBoolArray
+    private static readBoolArray(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
+        var length = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < length; i++ , offset++) {
+            array.push(dataView.getInt8(offset) == 1);
+        }
+        object[propertyKey] = array;
+        return length + 1;
+    }
     private static readUint8Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
         var length = dataView.getUint8(offset);
         offset += 1;
@@ -263,9 +307,9 @@ export class Buffer {
         var offSet = 0;
         var catheBuffer = new ArrayBuffer(128);
         var dataView = new DataView(catheBuffer);
-        var byteInfoArray=  Buffer.ClassInfoMap.get(obj.constructor.name);
-        for(let i=0;i<byteInfoArray.length;i++){
-            let byteInfo=byteInfoArray[i];
+        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
+        for (let i = 0; i < byteInfoArray.length; i++) {
+            let byteInfo = byteInfoArray[i];
             let byteLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[byteInfo.PropertyKey]);
             offSet += byteLength;
         }
@@ -281,6 +325,10 @@ export class Buffer {
     */
     private static writeProperty(dataView: DataView, offSet: number, type: ByteType, value: any): number {
         switch (type) {
+
+            case ByteType.Bool:
+                dataView.setInt8(offSet, (value as Boolean) ? 1 : 0)
+                return 1;
             case ByteType.Uint8:
                 dataView.setUint8(offSet, value as number)
                 return 1;
@@ -308,6 +356,8 @@ export class Buffer {
                 return Buffer.writeString(dataView, offSet, value as string);
 
             //数组
+            case ByteType.BoolArray:
+                return Buffer.writeBoolArray(dataView, offSet, value as Array<Boolean>);
             case ByteType.UInt8Array:
                 return Buffer.writeUint8Array(dataView, offSet, value as Array<number>);
             case ByteType.Int8Array:
@@ -331,6 +381,16 @@ export class Buffer {
 
     }
 
+    private static writeBoolArray(dataView: DataView, offset: number, array: Array<Boolean> = []): number {
+        var arrayLength = array.length;
+        dataView.setUint8(offset, arrayLength);
+        offset++;
+        for (var i = 0; i < arrayLength; i++) {
+            dataView.setInt8(offset, array[i] ? 1 : 0);
+            offset++;
+        }
+        return arrayLength + 1;
+    }
 
     private static writeUint8Array(dataView: DataView, offset: number, array: Array<number> = []): number {
         var arrayLength = array.length;
@@ -419,13 +479,13 @@ export class Buffer {
         var totalLength = Buffer.GetObjectByteLength(obj);
         dataView.setUint8(offSet, totalLength)
         offSet++;
-        var byteInfoArray=  Buffer.ClassInfoMap.get(obj.constructor.name);
-        for(let i=0;i<byteInfoArray.length;i++){
-            let byteInfo=byteInfoArray[i];
+        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
+        for (let i = 0; i < byteInfoArray.length; i++) {
+            let byteInfo = byteInfoArray[i];
             let byteLength = Buffer.writeProperty(dataView, offSet, byteInfo.Type, obj[byteInfo.PropertyKey]);
             offSet += byteLength;
         }
-       return totalLength + 1;
+        return totalLength + 1;
     }
 
     /**
@@ -494,9 +554,9 @@ export class Buffer {
         if (obj === null || obj === undefined) {
             return objectLength;
         }
-        var byteInfoArray=  Buffer.ClassInfoMap.get(obj.constructor.name);
-        for(let i=0;i<byteInfoArray.length;i++){
-            let byteInfo=byteInfoArray[i];
+        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
+        for (let i = 0; i < byteInfoArray.length; i++) {
+            let byteInfo = byteInfoArray[i];
             let byteLength = Buffer.getPropertyByteLength(byteInfo.Type, obj[byteInfo.PropertyKey]);
             objectLength += byteLength;
         }
@@ -513,6 +573,8 @@ export class Buffer {
      */
     private static getPropertyByteLength(type: ByteType, value: string | object | []): number {
         switch (type) {
+            case ByteType.Bool:
+                return 1;
             case ByteType.Uint8:
                 return 1;
             case ByteType.Int8:
@@ -533,6 +595,13 @@ export class Buffer {
                 return Buffer.getStringByteLength(value as string);
 
             //数组  number 如果数组为空 则 需要一bit 做标志位 
+            case ByteType.BoolArray:
+                {
+                    if (value == null) return 1;
+                    let length = (value as Array<Boolean>).length;
+                    return length == 0 ? 1 : length + 1;
+                }
+
             case ByteType.UInt8Array:
                 {
                     if (value == null) return 1;
@@ -603,6 +672,7 @@ export class Buffer {
         return length + 1;
     }
     //#endregion
+
 }
 
 /**属性修饰
@@ -612,7 +682,7 @@ export class Buffer {
  */
 export function ByteMember(order: number, type: ByteType, fun: Function = null) {
     return function (target: any, propertyKey: string) {
-        var byteInfo = new ByteInfo(propertyKey,order, type, fun)
+        var byteInfo = new ByteInfo(propertyKey, order, type, fun)
         var byteInfoArray = Buffer.ClassInfoMap.get(target.constructor.name);
         if (!byteInfoArray) {
             byteInfoArray = Array<ByteInfo>();
@@ -623,7 +693,7 @@ export function ByteMember(order: number, type: ByteType, fun: Function = null) 
             byteInfoArray.sort((a, b) => a.Order - b.Order)//排序
         }
     }
-    
+
 }
 
 /**类修饰
@@ -638,7 +708,7 @@ export function BtyeContract(target: any) {
  *Byte Type 
  */
 export enum ByteType {
-    Bool=11,
+    Bool = 11,
     Int8 = 1,
     Uint8 = 2,
     Int16 = 3,
@@ -651,7 +721,7 @@ export enum ByteType {
     Object = 10,
 
     //数组
-    BoolArray=19,
+    BoolArray = 19,
     Int8Array = 20,
     UInt8Array = 21,
     Int16Array = 23,
@@ -663,3 +733,6 @@ export enum ByteType {
     StringArray = 29,
     ObjectArray = 30,
 }
+
+
+
