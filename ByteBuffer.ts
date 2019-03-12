@@ -708,7 +708,7 @@ export function BtyeContract(target: any) {
  *Byte Type 
  */
 export enum ByteType {
-    Bool = 11,
+    Bool = 0,
     Int8 = 1,
     Uint8 = 2,
     Int16 = 3,
