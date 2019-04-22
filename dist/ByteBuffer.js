@@ -651,7 +651,7 @@ exports.BtyeContract = BtyeContract;
  */
 var ByteType;
 (function (ByteType) {
-    ByteType[ByteType["Bool"] = 11] = "Bool";
+    ByteType[ByteType["Bool"] = 0] = "Bool";
     ByteType[ByteType["Int8"] = 1] = "Int8";
     ByteType[ByteType["Uint8"] = 2] = "Uint8";
     ByteType[ByteType["Int16"] = 3] = "Int16";

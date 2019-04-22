@@ -26,9 +26,13 @@ export class Role {
     public Name: string;
 }
 
+export interface ServerMsg{
+    MessageType: MessageType;
+}
+
 
 @BtyeContract
-export class Msg {
+export class Msg implements ServerMsg {
 
     @ByteMember(1, ByteType.Uint8)
     public MessageType: MessageType = MessageType.join;

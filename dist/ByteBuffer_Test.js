@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Massage_1 = require("./Massage");
 const ByteBuffer_1 = require("./ByteBuffer");
 var msg = new Massage_1.Msg(); //sss
-msg.MessageType = Massage_1.MessageType.join;
+msg.MessageType = Massage_1.MessageType.move;
 msg.Address = "深圳";
 msg.Bool = false;
 msg.Name = "eric";

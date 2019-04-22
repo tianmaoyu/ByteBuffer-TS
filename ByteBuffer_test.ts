@@ -4,7 +4,7 @@ import { Buffer } from './ByteBuffer';
 
 
 var msg = new Msg();//sss
-msg.MessageType = MessageType.join;
+msg.MessageType = MessageType.move;
 msg.Address = "深圳";
 msg.Bool = false;
 msg.Name = "eric";
