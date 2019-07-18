@@ -7,9 +7,12 @@
         // 支持装饰器
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
+        // "types": [
+        //     "node"
+        // ]
     },
     "include": [ // 需要编译的ts文件一个*表示文件匹配**表示忽略文件的深度问题
         "./*.ts",
-        "./**/*.ts"
+        "./**/*.ts", "utf-8.js"
     ],
 }

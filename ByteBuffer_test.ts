@@ -1,6 +1,51 @@
 
 import { Msg, User, Role, MessageType } from './Massage';
 import { Buffer } from './ByteBuffer';
+import { UTF8 } from './UTF8';
+import { Int24 } from './Int24';
+import { UInt24 } from './UInt24';
+import { DataView2 } from './DataView2';
+import { UTF16 } from './UTF16';
+
+var buffer=new ArrayBuffer(100);
+var str1="werksdfksl2356789!@$%^&*()sdfhjkj";
+var utf8Length1= UTF8.getLength(str1);
+var utf16Length1= UTF16.getLength(str1);
+UTF8.write(buffer,0,str1);
+var str=UTF8.read(buffer,0,33)
+var dataView=new DataView(buffer);
+UTF16.write(dataView,0,str1);
+var str= UTF16.read(dataView,0,66)
+
+
+
+var str2="#通过配置端口指向部署外包烧烤摊的项目";
+var utf8Length2= UTF8.getLength(str2);
+var utf16Length2= UTF16.getLength(str2);
+UTF8.write(buffer,0,str2);
+ var str=UTF8.read(buffer,0,55)
+
+ UTF16.write(dataView,0,str2);
+var str= UTF16.read(dataView,0,38)
+
+
+Int24.write(buffer,0,12,true);
+var number= Int24.read(buffer,0,true);
+Int24.write(buffer,0,Int24.MaxVlaue+1,true);
+var number= Int24.read(buffer,0,true);
+Int24.write(buffer,0,Int24.MiniValue-1,true);
+var number= Int24.read(buffer,0,true);
+
+UInt24.write(buffer,0,100)
+var number= UInt24.read(buffer,0);
+UInt24.write(buffer,0,UInt24.MaxVlaue)
+var number= UInt24.read(buffer,0);
+UInt24.write(buffer,0,UInt24.MiniValue)
+var number= UInt24.read(buffer,0);
+
+var dataView2=new DataView2(buffer);
+
+dataView2.getUTF8String
 
 
 var msg = new Msg();//sss

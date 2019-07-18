@@ -5,7 +5,7 @@
  * @memberof util
  * @namespace
  */
-var utf8 = exports;
+ var utf8 = exports;
 
 /**
  * Calculates the UTF8 byte length of a string.

@@ -90,19 +90,19 @@ export class Buffer {
                 object[propertyKey] = dataView.getInt8(offSet);
                 return 1;
             case ByteType.Uint16:
-                object[propertyKey] = dataView.getUint16(offSet);
+                object[propertyKey] = dataView.getUint16(offSet,true);
                 return 2;
             case ByteType.Int16:
-                object[propertyKey] = dataView.getInt16(offSet);
+                object[propertyKey] = dataView.getInt16(offSet,true);
                 return 2;
             case ByteType.Int32:
-                object[propertyKey] = dataView.getInt32(offSet);
+                object[propertyKey] = dataView.getInt32(offSet,true);
                 return 4;
             case ByteType.Float32:
-                object[propertyKey] = dataView.getFloat32(offSet);
+                object[propertyKey] = dataView.getFloat32(offSet,true);
                 return 4;
             case ByteType.Float64:
-                object[propertyKey] = dataView.getFloat64(offSet);
+                object[propertyKey] = dataView.getFloat64(offSet,true);
                 return 8;
             case ByteType.String:
                 return Buffer.readString(dataView, offSet, object, propertyKey);
@@ -208,7 +208,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < lengthArray; i++ , offset += 2) {
-            array.push(dataView.getUint16(offset));
+            array.push(dataView.getUint16(offset,true));
         }
         object[propertyKey] = array;
         return lengthArray * 2 + 1;
@@ -219,7 +219,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < lengthArray; i++ , offset += 2) {
-            array.push(dataView.getInt16(offset));
+            array.push(dataView.getInt16(offset,true));
         }
         object[propertyKey] = array;
         return lengthArray * 2 + 1;
@@ -230,7 +230,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < lengthArray; i++ , offset += 4) {
-            array.push(dataView.getInt32(offset));
+            array.push(dataView.getInt32(offset,true));
         }
         object[propertyKey] = array;
         return lengthArray * 4 + 1;
@@ -241,7 +241,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < lengthArray; i++ , offset += 4) {
-            array.push(dataView.getFloat32(offset));
+            array.push(dataView.getFloat32(offset,true));
         }
         object[propertyKey] = array;
         return lengthArray * 4 + 1;
@@ -252,7 +252,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < lengthArray; i++ , offset += 8) {
-            array.push(dataView.getFloat64(offset));
+            array.push(dataView.getFloat64(offset,true));
         }
         object[propertyKey] = array;
         return lengthArray * 8 + 1;
@@ -269,7 +269,7 @@ export class Buffer {
             offset += 1;
             var chars = [];
             for (var i = 0; i < length / 2; i++ , offset += 2) {
-                chars.push(dataView.getUint16(offset));
+                chars.push(dataView.getUint16(offset,true));
             }
             var str = String.fromCharCode.apply(null, chars);
             arrar.push(str);
@@ -293,7 +293,7 @@ export class Buffer {
         offset += 1;
         var chars = [];
         for (var i = 0; i < length / 2; i++ , offset += 2) {
-            chars.push(dataView.getUint16(offset));
+            chars.push(dataView.getUint16(offset,true));
         }
         var str = String.fromCharCode.apply(null, chars);
         object[propertyKey] = str;
@@ -336,19 +336,19 @@ export class Buffer {
                 dataView.setInt8(offSet, value as number)
                 return 1;
             case ByteType.Uint16:
-                dataView.setUint16(offSet, value as number)
+                dataView.setUint16(offSet, value as number,true)
                 return 2;
             case ByteType.Int16:
-                dataView.setInt16(offSet, value as number)
+                dataView.setInt16(offSet, value as number,true)
                 return 2;
             case ByteType.Int32:
-                dataView.setInt32(offSet, value as number)
+                dataView.setInt32(offSet, value as number,true)
                 return 4;
             case ByteType.Float32:
-                dataView.setFloat32(offSet, value as number)
+                dataView.setFloat32(offSet, value as number,true)
                 return 4;
             case ByteType.Float64:
-                dataView.setFloat64(offSet, value as number)
+                dataView.setFloat64(offSet, value as number,true)
                 return 8;
             case ByteType.Object:
                 return Buffer.wirteInnerObject(dataView, offSet, value as object)
@@ -419,7 +419,7 @@ export class Buffer {
         dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setUint16(offset, array[i]);
+            dataView.setUint16(offset, array[i],true);
             offset += 2;
         }
         return arrayLength * 2 + 1;
@@ -430,7 +430,7 @@ export class Buffer {
         dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setInt16(offset, array[i]);
+            dataView.setInt16(offset, array[i],true);
             offset += 2;
         }
         return arrayLength * 2 + 1;
@@ -441,7 +441,7 @@ export class Buffer {
         dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setInt32(offset, array[i]);
+            dataView.setInt32(offset, array[i],true);
             offset += 4;
         }
         return arrayLength * 4 + 1;
@@ -452,7 +452,7 @@ export class Buffer {
         dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setFloat32(offset, array[i]);
+            dataView.setFloat32(offset, array[i],true);
             offset += 4;
         }
         return arrayLength * 4 + 1;
@@ -463,7 +463,7 @@ export class Buffer {
         dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setFloat64(offset, array[i]);
+            dataView.setFloat64(offset, array[i],true);
             offset += 8;
         }
         return arrayLength * 8 + 1;
@@ -521,7 +521,7 @@ export class Buffer {
         dataView.setUint8(offset, length);// 1 字节写入长度
         offset++;
         for (var i = 0; i < str.length; i++ , offset += 2) {
-            dataView.setUint16(offset, str.charCodeAt(i));
+            dataView.setUint16(offset, str.charCodeAt(i),true);
         }
         return length + 1;
     }
