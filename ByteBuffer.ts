@@ -1,32 +1,35 @@
 import "reflect-metadata";
 
+/**
+ * 字符串编码类型
+ */
+enum StringEncodingType{
+    /**
+     * 一个字符 2个字节来存储,
+     * 也叫 Unicode, 
+     */
+    UTF16=1,
+    /**
+     * 一个字符 使用 1-4 个字节来存储  
+     */
+    UTF8=2,
+}
 
-// /**
-//  * 字符串编码类型
-//  */
-// enum CharacterEncodingType{
-//     Unicode=1,// 一个字符 2个字节来存储
-//     UTF8=2,// 一个字符 使用 1-3 个字节来存储  
-// }
-// /**
-//  * 配置
-//  */
-// class Config{
-//    /**
-//     * 默认 1个字节 来存储 数组类型，和字符串类型，object 类型 的长度，一个字节存储 0-255
-//     */
-//    public static Array_Length_Max_Byte:number=1;
-//    /**
-//     * 默认 1个字节 来 存储 消息的 类别数，能存储 0-255个
-//     */
-//    public static Message_Type_Count_Max_Byte:number=1;
-//    /**
-//     * 默认 Unicode 字符的编码方式，目前只 实现了 Unicode，UTF8 
-//     */
-//    public static Character_Encoding_Type:CharacterEncodingType=CharacterEncodingType.Unicode;
+
+/**
+ * 配置
+ */
+export class BufferConfig{
+    /**
+     * 是否小端模式，java  默认大端，javascript 默认大端，c# ，c++默认小端
+     */
+    public static IsLittleEndian:Boolean=true;
+   /**
+    * 默认 utf16(Unicode) 字符的编码方式，目前只 实现了utf16(Unicode)，UTF8 
+    */
+   public static StringEncodingType:StringEncodingType=StringEncodingType.UTF16;
    
-// }
-
+}
 
 
 /**byte 类型
@@ -732,6 +735,13 @@ export enum ByteType {
     Float64Array = 28,
     StringArray = 29,
     ObjectArray = 30,
+
+    //新增int24
+    Int24=31,
+    UInt24=32,
+    Int24Array=33,
+    UInt24Array=24,
+
 }
 
 

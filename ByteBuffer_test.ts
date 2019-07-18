@@ -17,14 +17,11 @@ var dataView=new DataView(buffer);
 UTF16.write(dataView,0,str1);
 var str= UTF16.read(dataView,0,66)
 
-
-
 var str2="#通过配置端口指向部署外包烧烤摊的项目";
 var utf8Length2= UTF8.getLength(str2);
 var utf16Length2= UTF16.getLength(str2);
 UTF8.write(buffer,0,str2);
  var str=UTF8.read(buffer,0,55)
-
  UTF16.write(dataView,0,str2);
 var str= UTF16.read(dataView,0,38)
 
