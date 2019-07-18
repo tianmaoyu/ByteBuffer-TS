@@ -1,34 +1,36 @@
 import "reflect-metadata";
+import { Int24 } from "./Int24";
+import { UInt24 } from "./UInt24";
 
 /**
  * 字符串编码类型
  */
-enum StringEncodingType{
+enum StringEncodingType {
     /**
      * 一个字符 2个字节来存储,
      * 也叫 Unicode, 
      */
-    UTF16=1,
+    UTF16 = 1,
     /**
      * 一个字符 使用 1-4 个字节来存储  
      */
-    UTF8=2,
+    UTF8 = 2,
 }
 
 
 /**
  * 配置
  */
-export class BufferConfig{
+export class BufferConfig {
     /**
      * 是否小端模式，java  默认大端，javascript 默认大端，c# ，c++默认小端
      */
-    public static IsLittleEndian:Boolean=true;
-   /**
-    * 默认 utf16(Unicode) 字符的编码方式，目前只 实现了utf16(Unicode)，UTF8 
-    */
-   public static StringEncodingType:StringEncodingType=StringEncodingType.UTF16;
-   
+    public static IsLittleEndian: boolean = true;
+    /**
+     * 默认 utf16(Unicode) 字符的编码方式，目前只 实现了utf16(Unicode)，UTF8 
+     */
+    public static StringEncodingType: StringEncodingType = StringEncodingType.UTF16;
+
 }
 
 
@@ -93,19 +95,19 @@ export class Buffer {
                 object[propertyKey] = dataView.getInt8(offSet);
                 return 1;
             case ByteType.Uint16:
-                object[propertyKey] = dataView.getUint16(offSet,true);
+                object[propertyKey] = dataView.getUint16(offSet, true);
                 return 2;
             case ByteType.Int16:
-                object[propertyKey] = dataView.getInt16(offSet,true);
+                object[propertyKey] = dataView.getInt16(offSet, true);
                 return 2;
             case ByteType.Int32:
-                object[propertyKey] = dataView.getInt32(offSet,true);
+                object[propertyKey] = dataView.getInt32(offSet, true);
                 return 4;
             case ByteType.Float32:
-                object[propertyKey] = dataView.getFloat32(offSet,true);
+                object[propertyKey] = dataView.getFloat32(offSet, true);
                 return 4;
             case ByteType.Float64:
-                object[propertyKey] = dataView.getFloat64(offSet,true);
+                object[propertyKey] = dataView.getFloat64(offSet, true);
                 return 8;
             case ByteType.String:
                 return Buffer.readString(dataView, offSet, object, propertyKey);
@@ -133,10 +135,43 @@ export class Buffer {
                 return Buffer.readStringArray(dataView, offSet, object, propertyKey);
             case ByteType.ObjectArray:
                 return Buffer.readInnerObjectArray(dataView, offSet, object, propertyKey, byteInfo);
+
+            //新增的 int24
+            case ByteType.Int24:
+                object[propertyKey] = Int24.read(dataView.buffer, offSet, BufferConfig.IsLittleEndian);
+                return 3;
+            case ByteType.UInt24:
+                object[propertyKey] = UInt24.read(dataView.buffer, offSet, BufferConfig.IsLittleEndian);
+                return 3;
+            case ByteType.Int24Array:
+                return Buffer.readInt24Array(dataView, offSet, object, propertyKey);
+            case ByteType.Int24Array:
+                return Buffer.readUInt24Array(dataView, offSet, object, propertyKey);
         }
 
     }
 
+    private static readInt24Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
+        var arrayLength = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < arrayLength; i++ , offset += 3) {
+            array.push(Int24.read(dataView.buffer, offset, BufferConfig.IsLittleEndian));
+        }
+        object[propertyKey] = array;
+        return arrayLength * 3 + 1;
+    }
+
+    private static readUInt24Array(dataView: DataView, offset: number, object: Object, propertyKey: string): number {
+        var arrayLength = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < arrayLength; i++ , offset += 3) {
+            array.push(UInt24.read(dataView.buffer, offset, BufferConfig.IsLittleEndian));
+        }
+        object[propertyKey] = array;
+        return arrayLength * 3 + 1;
+    }
 
     private static readInnerObject(dataView: DataView, offset: number, object: Object, propertyKey: string, byteInfo: ByteInfo): number {
         var length = dataView.getUint8(offset);
@@ -211,7 +246,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < lengthArray; i++ , offset += 2) {
-            array.push(dataView.getUint16(offset,true));
+            array.push(dataView.getUint16(offset, true));
         }
         object[propertyKey] = array;
         return lengthArray * 2 + 1;
@@ -222,7 +257,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < lengthArray; i++ , offset += 2) {
-            array.push(dataView.getInt16(offset,true));
+            array.push(dataView.getInt16(offset, true));
         }
         object[propertyKey] = array;
         return lengthArray * 2 + 1;
@@ -233,7 +268,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < lengthArray; i++ , offset += 4) {
-            array.push(dataView.getInt32(offset,true));
+            array.push(dataView.getInt32(offset, true));
         }
         object[propertyKey] = array;
         return lengthArray * 4 + 1;
@@ -244,7 +279,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < lengthArray; i++ , offset += 4) {
-            array.push(dataView.getFloat32(offset,true));
+            array.push(dataView.getFloat32(offset, true));
         }
         object[propertyKey] = array;
         return lengthArray * 4 + 1;
@@ -255,7 +290,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < lengthArray; i++ , offset += 8) {
-            array.push(dataView.getFloat64(offset,true));
+            array.push(dataView.getFloat64(offset, true));
         }
         object[propertyKey] = array;
         return lengthArray * 8 + 1;
@@ -272,7 +307,7 @@ export class Buffer {
             offset += 1;
             var chars = [];
             for (var i = 0; i < length / 2; i++ , offset += 2) {
-                chars.push(dataView.getUint16(offset,true));
+                chars.push(dataView.getUint16(offset, true));
             }
             var str = String.fromCharCode.apply(null, chars);
             arrar.push(str);
@@ -296,7 +331,7 @@ export class Buffer {
         offset += 1;
         var chars = [];
         for (var i = 0; i < length / 2; i++ , offset += 2) {
-            chars.push(dataView.getUint16(offset,true));
+            chars.push(dataView.getUint16(offset, true));
         }
         var str = String.fromCharCode.apply(null, chars);
         object[propertyKey] = str;
@@ -339,19 +374,19 @@ export class Buffer {
                 dataView.setInt8(offSet, value as number)
                 return 1;
             case ByteType.Uint16:
-                dataView.setUint16(offSet, value as number,true)
+                dataView.setUint16(offSet, value as number, true)
                 return 2;
             case ByteType.Int16:
-                dataView.setInt16(offSet, value as number,true)
+                dataView.setInt16(offSet, value as number, true)
                 return 2;
             case ByteType.Int32:
-                dataView.setInt32(offSet, value as number,true)
+                dataView.setInt32(offSet, value as number, true)
                 return 4;
             case ByteType.Float32:
-                dataView.setFloat32(offSet, value as number,true)
+                dataView.setFloat32(offSet, value as number, true)
                 return 4;
             case ByteType.Float64:
-                dataView.setFloat64(offSet, value as number,true)
+                dataView.setFloat64(offSet, value as number, true)
                 return 8;
             case ByteType.Object:
                 return Buffer.wirteInnerObject(dataView, offSet, value as object)
@@ -375,14 +410,49 @@ export class Buffer {
                 return Buffer.writeFloat32Array(dataView, offSet, value as Array<number>);
             case ByteType.Float64Array:
                 return Buffer.writeFloat64Array(dataView, offSet, value as Array<number>);
-
             case ByteType.ObjectArray:
-                return Buffer.wirteInnerObjectArray(dataView, offSet, value as Array<object>)
+                return Buffer.wirteInnerObjectArray(dataView, offSet, value as Array<object>);
             case ByteType.StringArray:
-                return Buffer.writeStringArray(dataView, offSet, value as Array<string>)
+                return Buffer.writeStringArray(dataView, offSet, value as Array<string>);
+
+            //新增的 int24
+            case ByteType.Int24:
+                Int24.write(dataView.buffer, offSet, value, BufferConfig.IsLittleEndian)
+                return 3;
+            case ByteType.Int24:
+                UInt24.write(dataView.buffer, offSet, value, BufferConfig.IsLittleEndian)
+                return 3;
+            case ByteType.Int24:
+                return Buffer.writeInt24Array(dataView, offSet, value as Array<number>);
+            case ByteType.Int24:
+                return Buffer.writeUInt24Array(dataView, offSet, value as Array<number>);
         }
 
     }
+
+    private static writeInt24Array(dataView: DataView, offSet: number, array: Array<number>): number {
+        var arrayLength = array.length;
+        dataView.setUint8(offSet, arrayLength);
+        offSet++;
+        for (var i = 0; i < arrayLength; i++) {
+            Int24.write(dataView.buffer, offSet, array[i], BufferConfig.IsLittleEndian)
+            offSet += 3;
+        }
+        return arrayLength * 3 + 1;
+    }
+
+    private static writeUInt24Array(dataView: DataView, offSet: number, array: Array<number>): number {
+        var arrayLength = array.length;
+        dataView.setUint8(offSet, arrayLength);
+        offSet++;
+        for (var i = 0; i < arrayLength; i++) {
+            UInt24.write(dataView.buffer, offSet, array[i], BufferConfig.IsLittleEndian)
+            offSet += 3;
+        }
+        return arrayLength * 3 + 1;
+    }
+
+
 
     private static writeBoolArray(dataView: DataView, offset: number, array: Array<Boolean> = []): number {
         var arrayLength = array.length;
@@ -422,7 +492,7 @@ export class Buffer {
         dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setUint16(offset, array[i],true);
+            dataView.setUint16(offset, array[i], true);
             offset += 2;
         }
         return arrayLength * 2 + 1;
@@ -433,7 +503,7 @@ export class Buffer {
         dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setInt16(offset, array[i],true);
+            dataView.setInt16(offset, array[i], true);
             offset += 2;
         }
         return arrayLength * 2 + 1;
@@ -444,7 +514,7 @@ export class Buffer {
         dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setInt32(offset, array[i],true);
+            dataView.setInt32(offset, array[i], true);
             offset += 4;
         }
         return arrayLength * 4 + 1;
@@ -455,7 +525,7 @@ export class Buffer {
         dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setFloat32(offset, array[i],true);
+            dataView.setFloat32(offset, array[i], true);
             offset += 4;
         }
         return arrayLength * 4 + 1;
@@ -466,7 +536,7 @@ export class Buffer {
         dataView.setUint8(offset, arrayLength);
         offset++;
         for (var i = 0; i < arrayLength; i++) {
-            dataView.setFloat64(offset, array[i],true);
+            dataView.setFloat64(offset, array[i], true);
             offset += 8;
         }
         return arrayLength * 8 + 1;
@@ -524,7 +594,7 @@ export class Buffer {
         dataView.setUint8(offset, length);// 1 字节写入长度
         offset++;
         for (var i = 0; i < str.length; i++ , offset += 2) {
-            dataView.setUint16(offset, str.charCodeAt(i),true);
+            dataView.setUint16(offset, str.charCodeAt(i), true);
         }
         return length + 1;
     }
@@ -602,59 +672,54 @@ export class Buffer {
                 {
                     if (value == null) return 1;
                     let length = (value as Array<Boolean>).length;
-                    return length == 0 ? 1 : length + 1;
+                    return  length + 1;
                 }
-
             case ByteType.UInt8Array:
-                {
-                    if (value == null) return 1;
-                    let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length + 1;
-                }
             case ByteType.Int8Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length + 1;
+                    return  length + 1;
                 }
             case ByteType.Uint16Array:
-                {
-                    if (value == null) return 1;
-                    let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 2 + 1;
-                }
             case ByteType.Int16Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 2 + 1;
+                    return length * 2 + 1;
                 }
             case ByteType.Int32Array:
-                {
-                    if (value == null) return 1;
-                    let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 4 + 1;
-                }
             case ByteType.Float32Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 4 + 1;
+                    return  length * 4 + 1;
                 }
             case ByteType.Float64Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return length == 0 ? 1 : length * 8 + 1;
+                    return  length * 8 + 1;
                 }
             case ByteType.ObjectArray:
-                return Buffer.getObjectArrayByteLength(value as Array<object>)
+                return Buffer.getObjectArrayByteLength(value as Array<object>);
             case ByteType.StringArray:
-                return Buffer.getStringArrayByteLength(value as Array<string>)
+                return Buffer.getStringArrayByteLength(value as Array<string>);
+                //INT24
+            case ByteType.Int24:
+            case ByteType.UInt24:
+                return 3;
+            case ByteType.Int24Array:
+            case ByteType.UInt24Array:
+                {
+                    if (value == null) return 1;
+                    let length = (value as Array<number>).length;
+                    return length * 3 + 1;
+                }
         }
 
     }
-
+   
     private static getStringByteLength(str: string): number {
         return str.length * 2 + 1;//
     }
@@ -737,10 +802,10 @@ export enum ByteType {
     ObjectArray = 30,
 
     //新增int24
-    Int24=31,
-    UInt24=32,
-    Int24Array=33,
-    UInt24Array=24,
+    Int24 = 31,
+    UInt24 = 32,
+    Int24Array = 33,
+    UInt24Array = 24,
 
 }
 

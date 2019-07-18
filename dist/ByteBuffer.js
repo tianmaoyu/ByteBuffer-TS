@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
+const Int24_1 = require("./Int24");
+const UInt24_1 = require("./UInt24");
 /**
  * 字符串编码类型
  */
@@ -113,7 +115,38 @@ class Buffer {
                 return Buffer.readStringArray(dataView, offSet, object, propertyKey);
             case ByteType.ObjectArray:
                 return Buffer.readInnerObjectArray(dataView, offSet, object, propertyKey, byteInfo);
+            //新增的 int24
+            case ByteType.Int24:
+                object[propertyKey] = Int24_1.Int24.read(dataView.buffer, offSet, BufferConfig.IsLittleEndian);
+                return 3;
+            case ByteType.UInt24:
+                object[propertyKey] = UInt24_1.UInt24.read(dataView.buffer, offSet, BufferConfig.IsLittleEndian);
+                return 3;
+            case ByteType.Int24Array:
+                return Buffer.readInt24Array(dataView, offSet, object, propertyKey);
+            case ByteType.Int24Array:
+                return Buffer.readUInt24Array(dataView, offSet, object, propertyKey);
         }
+    }
+    static readInt24Array(dataView, offset, object, propertyKey) {
+        var arrayLength = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < arrayLength; i++, offset += 3) {
+            array.push(Int24_1.Int24.read(dataView.buffer, offset, BufferConfig.IsLittleEndian));
+        }
+        object[propertyKey] = array;
+        return arrayLength * 3 + 1;
+    }
+    static readUInt24Array(dataView, offset, object, propertyKey) {
+        var arrayLength = dataView.getUint8(offset);
+        offset += 1;
+        var array = [];
+        for (var i = 0; i < arrayLength; i++, offset += 3) {
+            array.push(UInt24_1.UInt24.read(dataView.buffer, offset, BufferConfig.IsLittleEndian));
+        }
+        object[propertyKey] = array;
+        return arrayLength * 3 + 1;
     }
     static readInnerObject(dataView, offset, object, propertyKey, byteInfo) {
         var length = dataView.getUint8(offset);
@@ -335,7 +368,38 @@ class Buffer {
                 return Buffer.wirteInnerObjectArray(dataView, offSet, value);
             case ByteType.StringArray:
                 return Buffer.writeStringArray(dataView, offSet, value);
+            //新增的 int24
+            case ByteType.Int24:
+                Int24_1.Int24.write(dataView.buffer, offSet, value, BufferConfig.IsLittleEndian);
+                return 3;
+            case ByteType.Int24:
+                UInt24_1.UInt24.write(dataView.buffer, offSet, value, BufferConfig.IsLittleEndian);
+                return 3;
+            case ByteType.Int24:
+                return Buffer.writeInt24Array(dataView, offSet, value);
+            case ByteType.Int24:
+                return Buffer.writeUInt24Array(dataView, offSet, value);
         }
+    }
+    static writeInt24Array(dataView, offSet, array) {
+        var arrayLength = array.length;
+        dataView.setUint8(offSet, arrayLength);
+        offSet++;
+        for (var i = 0; i < arrayLength; i++) {
+            Int24_1.Int24.write(dataView.buffer, offSet, array[i], BufferConfig.IsLittleEndian);
+            offSet += 3;
+        }
+        return arrayLength * 3 + 1;
+    }
+    static writeUInt24Array(dataView, offSet, array) {
+        var arrayLength = array.length;
+        dataView.setUint8(offSet, arrayLength);
+        offSet++;
+        for (var i = 0; i < arrayLength; i++) {
+            UInt24_1.UInt24.write(dataView.buffer, offSet, array[i], BufferConfig.IsLittleEndian);
+            offSet += 3;
+        }
+        return arrayLength * 3 + 1;
     }
     static writeBoolArray(dataView, offset, array = []) {
         var arrayLength = array.length;
@@ -539,61 +603,55 @@ class Buffer {
                     if (value == null)
                         return 1;
                     let length = value.length;
-                    return length == 0 ? 1 : length + 1;
+                    return length + 1;
                 }
             case ByteType.UInt8Array:
-                {
-                    if (value == null)
-                        return 1;
-                    let length = value.length;
-                    return length == 0 ? 1 : length + 1;
-                }
             case ByteType.Int8Array:
                 {
                     if (value == null)
                         return 1;
                     let length = value.length;
-                    return length == 0 ? 1 : length + 1;
+                    return length + 1;
                 }
             case ByteType.Uint16Array:
-                {
-                    if (value == null)
-                        return 1;
-                    let length = value.length;
-                    return length == 0 ? 1 : length * 2 + 1;
-                }
             case ByteType.Int16Array:
                 {
                     if (value == null)
                         return 1;
                     let length = value.length;
-                    return length == 0 ? 1 : length * 2 + 1;
+                    return length * 2 + 1;
                 }
             case ByteType.Int32Array:
-                {
-                    if (value == null)
-                        return 1;
-                    let length = value.length;
-                    return length == 0 ? 1 : length * 4 + 1;
-                }
             case ByteType.Float32Array:
                 {
                     if (value == null)
                         return 1;
                     let length = value.length;
-                    return length == 0 ? 1 : length * 4 + 1;
+                    return length * 4 + 1;
                 }
             case ByteType.Float64Array:
                 {
                     if (value == null)
                         return 1;
                     let length = value.length;
-                    return length == 0 ? 1 : length * 8 + 1;
+                    return length * 8 + 1;
                 }
             case ByteType.ObjectArray:
                 return Buffer.getObjectArrayByteLength(value);
             case ByteType.StringArray:
                 return Buffer.getStringArrayByteLength(value);
+            //INT24
+            case ByteType.Int24:
+            case ByteType.UInt24:
+                return 3;
+            case ByteType.Int24Array:
+            case ByteType.UInt24Array:
+                {
+                    if (value == null)
+                        return 1;
+                    let length = value.length;
+                    return length * 3 + 1;
+                }
         }
     }
     static getStringByteLength(str) {
