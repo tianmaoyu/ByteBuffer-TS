@@ -805,7 +805,7 @@ export enum ByteType {
     Int24 = 31,
     UInt24 = 32,
     Int24Array = 33,
-    UInt24Array = 24,
+    UInt24Array = 34,
 
 }
 

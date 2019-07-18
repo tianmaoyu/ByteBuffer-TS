@@ -741,6 +741,6 @@ var ByteType;
     ByteType[ByteType["Int24"] = 31] = "Int24";
     ByteType[ByteType["UInt24"] = 32] = "UInt24";
     ByteType[ByteType["Int24Array"] = 33] = "Int24Array";
-    ByteType[ByteType["UInt24Array"] = 24] = "UInt24Array";
+    ByteType[ByteType["UInt24Array"] = 34] = "UInt24Array";
 })(ByteType = exports.ByteType || (exports.ByteType = {}));
 //# sourceMappingURL=ByteBuffer.js.map
