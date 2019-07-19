@@ -38,11 +38,10 @@ user.RoleList.push(guest);
 
 var arrayBuffer= Buffer.WirteObject(user);
 var _user=Buffer.ReadObject<User>(User,arrayBuffer);
-console.info("byteBuffer:"+arrayBuffer.byteLength);
-console.info(JSON.stringify(_user))
-
-console.info("json:"+JSON.stringify(user).length);
 console.info(JSON.stringify(_user));
+console.info("byteBuffer:"+arrayBuffer.byteLength);
+console.info("json:"+JSON.stringify(user).length);
+
 //#endregion 
 
 //#region 时间测试

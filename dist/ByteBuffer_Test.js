@@ -30,10 +30,9 @@ user.RoleList.push(admin);
 user.RoleList.push(guest);
 var arrayBuffer = ByteBuffer_1.Buffer.WirteObject(user);
 var _user = ByteBuffer_1.Buffer.ReadObject(Massage_1.User, arrayBuffer);
+console.info(JSON.stringify(_user));
 console.info("byteBuffer:" + arrayBuffer.byteLength);
-console.info(JSON.stringify(_user));
 console.info("json:" + JSON.stringify(user).length);
-console.info(JSON.stringify(_user));
 //#endregion 
 //#region 时间测试
 var msg = new Massage_1.ComplexMsg();
