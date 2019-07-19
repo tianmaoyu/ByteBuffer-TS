@@ -107,6 +107,16 @@ ComplexMsg = __decorate([
     ByteBuffer_1.BtyeContract
 ], ComplexMsg);
 exports.ComplexMsg = ComplexMsg;
+let Number24Msg = class Number24Msg {
+};
+__decorate([
+    ByteBuffer_1.ByteMember(7, ByteBuffer_1.ByteType.Int24),
+    __metadata("design:type", Number)
+], Number24Msg.prototype, "Id", void 0);
+Number24Msg = __decorate([
+    ByteBuffer_1.BtyeContract
+], Number24Msg);
+exports.Number24Msg = Number24Msg;
 let NumberMsg = class NumberMsg {
 };
 __decorate([

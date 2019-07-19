@@ -80,6 +80,19 @@ export class ComplexMsg implements ServerMsg {
     public IsVip:boolean;
 }
 
+@BtyeContract
+export class Number24Msg {
+
+    @ByteMember(7, ByteType.Int24)
+    public Id: number;
+    // @ByteMember(8, ByteType.Int24Array)
+    // public Int24Array: Array<number>;
+
+    // @ByteMember(9, ByteType.UInt24)
+    // public UInt24: number;
+    // @ByteMember(10, ByteType.UInt24Array)
+    // public UInt24Array: Array<number>;
+}
 
 @BtyeContract
 export class NumberMsg {

@@ -138,15 +138,17 @@ export class Buffer {
 
             //新增的 int24
             case ByteType.Int24:
-                object[propertyKey] = Int24.read(dataView.buffer, offSet, BufferConfig.IsLittleEndian);
+                object[propertyKey] = Int24.read(dataView, offSet, BufferConfig.IsLittleEndian);
                 return 3;
             case ByteType.UInt24:
-                object[propertyKey] = UInt24.read(dataView.buffer, offSet, BufferConfig.IsLittleEndian);
+                object[propertyKey] = UInt24.read(dataView, offSet, BufferConfig.IsLittleEndian);
                 return 3;
             case ByteType.Int24Array:
                 return Buffer.readInt24Array(dataView, offSet, object, propertyKey);
-            case ByteType.Int24Array:
+            case ByteType.UInt24Array:
                 return Buffer.readUInt24Array(dataView, offSet, object, propertyKey);
+            default:
+                throw new TypeError("没有这种类型")
         }
 
     }
@@ -156,7 +158,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < arrayLength; i++ , offset += 3) {
-            array.push(Int24.read(dataView.buffer, offset, BufferConfig.IsLittleEndian));
+            array.push(Int24.read(dataView, offset, BufferConfig.IsLittleEndian));
         }
         object[propertyKey] = array;
         return arrayLength * 3 + 1;
@@ -167,7 +169,7 @@ export class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < arrayLength; i++ , offset += 3) {
-            array.push(UInt24.read(dataView.buffer, offset, BufferConfig.IsLittleEndian));
+            array.push(UInt24.read(dataView, offset, BufferConfig.IsLittleEndian));
         }
         object[propertyKey] = array;
         return arrayLength * 3 + 1;
@@ -343,15 +345,15 @@ export class Buffer {
     //#region write method
     public static WirteObject(obj: Object) {
         var offSet = 0;
-        var catheBuffer = new ArrayBuffer(128);
-        var dataView = new DataView(catheBuffer);
+        var cacheBuffer = new ArrayBuffer(128);
+        var dataView = new DataView(cacheBuffer);
         var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
         for (let i = 0; i < byteInfoArray.length; i++) {
             let byteInfo = byteInfoArray[i];
             let byteLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[byteInfo.PropertyKey]);
             offSet += byteLength;
         }
-        var buffer = catheBuffer.slice(0, offSet);
+        var buffer = cacheBuffer.slice(0, offSet);
         return buffer;
     }
 
@@ -363,7 +365,6 @@ export class Buffer {
     */
     private static writeProperty(dataView: DataView, offSet: number, type: ByteType, value: any): number {
         switch (type) {
-
             case ByteType.Bool:
                 dataView.setInt8(offSet, (value as Boolean) ? 1 : 0)
                 return 1;
@@ -417,36 +418,38 @@ export class Buffer {
 
             //新增的 int24
             case ByteType.Int24:
-                Int24.write(dataView.buffer, offSet, value, BufferConfig.IsLittleEndian)
+                Int24.write(dataView, offSet, value, BufferConfig.IsLittleEndian)
                 return 3;
-            case ByteType.Int24:
-                UInt24.write(dataView.buffer, offSet, value, BufferConfig.IsLittleEndian)
+            case ByteType.UInt24:
+                UInt24.write(dataView, offSet, value, BufferConfig.IsLittleEndian)
                 return 3;
-            case ByteType.Int24:
+            case ByteType.Int24Array:
                 return Buffer.writeInt24Array(dataView, offSet, value as Array<number>);
-            case ByteType.Int24:
+            case ByteType.UInt24Array:
                 return Buffer.writeUInt24Array(dataView, offSet, value as Array<number>);
+            default:
+                throw new TypeError("没有这种类型")
         }
 
     }
 
-    private static writeInt24Array(dataView: DataView, offSet: number, array: Array<number>=[]): number {
+    private static writeInt24Array(dataView: DataView, offSet: number, array: Array<number> = []): number {
         var arrayLength = array.length;
         dataView.setUint8(offSet, arrayLength);
         offSet++;
         for (var i = 0; i < arrayLength; i++) {
-            Int24.write(dataView.buffer, offSet, array[i], BufferConfig.IsLittleEndian)
+            Int24.write(dataView, offSet, array[i], BufferConfig.IsLittleEndian)
             offSet += 3;
         }
         return arrayLength * 3 + 1;
     }
 
-    private static writeUInt24Array(dataView: DataView, offSet: number, array: Array<number>=[]): number {
+    private static writeUInt24Array(dataView: DataView, offSet: number, array: Array<number> = []): number {
         var arrayLength = array.length;
         dataView.setUint8(offSet, arrayLength);
         offSet++;
         for (var i = 0; i < arrayLength; i++) {
-            UInt24.write(dataView.buffer, offSet, array[i], BufferConfig.IsLittleEndian)
+            UInt24.write(dataView, offSet, array[i], BufferConfig.IsLittleEndian)
             offSet += 3;
         }
         return arrayLength * 3 + 1;
@@ -624,7 +627,7 @@ export class Buffer {
      */
     public static GetObjectByteLength(obj: Object) {
         var objectLength = 0;
-        if ( obj === undefined ||obj === null ) {
+        if (obj === undefined || obj === null) {
             return objectLength;
         }
         var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
@@ -672,14 +675,14 @@ export class Buffer {
                 {
                     if (value == null) return 1;
                     let length = (value as Array<Boolean>).length;
-                    return  length + 1;
+                    return length + 1;
                 }
             case ByteType.UInt8Array:
             case ByteType.Int8Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return  length + 1;
+                    return length + 1;
                 }
             case ByteType.UInt16Array:
             case ByteType.Int16Array:
@@ -693,19 +696,19 @@ export class Buffer {
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return  length * 4 + 1;
+                    return length * 4 + 1;
                 }
             case ByteType.Float64Array:
                 {
                     if (value == null) return 1;
                     let length = (value as Array<number>).length;
-                    return  length * 8 + 1;
+                    return length * 8 + 1;
                 }
             case ByteType.ObjectArray:
                 return Buffer.getObjectArrayByteLength(value as Array<object>);
             case ByteType.StringArray:
                 return Buffer.getStringArrayByteLength(value as Array<string>);
-                //INT24
+            //INT24
             case ByteType.Int24:
             case ByteType.UInt24:
                 return 3;
@@ -716,15 +719,17 @@ export class Buffer {
                     let length = (value as Array<number>).length;
                     return length * 3 + 1;
                 }
+            default:
+                throw new TypeError("没有这种类型")
         }
 
     }
-   
-    private static getStringByteLength(str: string=""): number {
+
+    private static getStringByteLength(str: string = ""): number {
         return str.length * 2 + 1;//
     }
 
-    private static getStringArrayByteLength(strArray: Array<string>=[]): number {
+    private static getStringArrayByteLength(strArray: Array<string> = []): number {
         var length = 0
         for (var i = 0; i < strArray.length; i++) {
             length += Buffer.getStringByteLength(strArray[i]);
@@ -732,7 +737,7 @@ export class Buffer {
         return length + 1;
     }
 
-    private static getObjectArrayByteLength(objArray: Array<object>=[]) {
+    private static getObjectArrayByteLength(objArray: Array<object> = []) {
         var length = 0;
         for (var i = 0; i < objArray.length; i++) {
             length += Buffer.GetObjectByteLength(objArray[i]);

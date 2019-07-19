@@ -7,9 +7,11 @@ class UInt24 {
      * @param offset
      * @param littleEndian
      */
-    static read(buffer, offset, littleEndian = false) {
+    static read(dataView, offset, littleEndian = false) {
+        let buffer = dataView.buffer;
         if (littleEndian) {
-            return buffer[0 + offset] | (buffer[1 + offset] << 8) | (buffer[2 + offset] << 16);
+            var number = buffer[0 + offset] | (buffer[1 + offset] << 8) | (buffer[2 + offset] << 16);
+            return number;
         }
         return buffer[2 + offset] | (buffer[1 + offset] << 8) | (buffer[0 + offset] << 16);
     }
@@ -20,7 +22,8 @@ class UInt24 {
      * @param offset 写入偏移量
      * @param littleEndian 默认大端
      */
-    static write(buffer, offset, value, littleEndian = false) {
+    static write(dataView, offset, value, littleEndian = false) {
+        let buffer = dataView.buffer;
         if (littleEndian) {
             buffer[0 + offset] = value & 0xff;
             buffer[1 + offset] = (value & 0xff00) >> 8;

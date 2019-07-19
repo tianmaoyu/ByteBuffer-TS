@@ -117,15 +117,17 @@ class Buffer {
                 return Buffer.readInnerObjectArray(dataView, offSet, object, propertyKey, byteInfo);
             //新增的 int24
             case ByteType.Int24:
-                object[propertyKey] = Int24_1.Int24.read(dataView.buffer, offSet, BufferConfig.IsLittleEndian);
+                object[propertyKey] = Int24_1.Int24.read(dataView, offSet, BufferConfig.IsLittleEndian);
                 return 3;
             case ByteType.UInt24:
-                object[propertyKey] = UInt24_1.UInt24.read(dataView.buffer, offSet, BufferConfig.IsLittleEndian);
+                object[propertyKey] = UInt24_1.UInt24.read(dataView, offSet, BufferConfig.IsLittleEndian);
                 return 3;
             case ByteType.Int24Array:
                 return Buffer.readInt24Array(dataView, offSet, object, propertyKey);
-            case ByteType.Int24Array:
+            case ByteType.UInt24Array:
                 return Buffer.readUInt24Array(dataView, offSet, object, propertyKey);
+            default:
+                throw new TypeError("没有这种类型");
         }
     }
     static readInt24Array(dataView, offset, object, propertyKey) {
@@ -133,7 +135,7 @@ class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < arrayLength; i++, offset += 3) {
-            array.push(Int24_1.Int24.read(dataView.buffer, offset, BufferConfig.IsLittleEndian));
+            array.push(Int24_1.Int24.read(dataView, offset, BufferConfig.IsLittleEndian));
         }
         object[propertyKey] = array;
         return arrayLength * 3 + 1;
@@ -143,7 +145,7 @@ class Buffer {
         offset += 1;
         var array = [];
         for (var i = 0; i < arrayLength; i++, offset += 3) {
-            array.push(UInt24_1.UInt24.read(dataView.buffer, offset, BufferConfig.IsLittleEndian));
+            array.push(UInt24_1.UInt24.read(dataView, offset, BufferConfig.IsLittleEndian));
         }
         object[propertyKey] = array;
         return arrayLength * 3 + 1;
@@ -301,15 +303,15 @@ class Buffer {
     //#region write method
     static WirteObject(obj) {
         var offSet = 0;
-        var catheBuffer = new ArrayBuffer(128);
-        var dataView = new DataView(catheBuffer);
+        var cacheBuffer = new ArrayBuffer(128);
+        var dataView = new DataView(cacheBuffer);
         var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
         for (let i = 0; i < byteInfoArray.length; i++) {
             let byteInfo = byteInfoArray[i];
             let byteLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[byteInfo.PropertyKey]);
             offSet += byteLength;
         }
-        var buffer = catheBuffer.slice(0, offSet);
+        var buffer = cacheBuffer.slice(0, offSet);
         return buffer;
     }
     /**
@@ -370,15 +372,17 @@ class Buffer {
                 return Buffer.writeStringArray(dataView, offSet, value);
             //新增的 int24
             case ByteType.Int24:
-                Int24_1.Int24.write(dataView.buffer, offSet, value, BufferConfig.IsLittleEndian);
+                Int24_1.Int24.write(dataView, offSet, value, BufferConfig.IsLittleEndian);
                 return 3;
-            case ByteType.Int24:
-                UInt24_1.UInt24.write(dataView.buffer, offSet, value, BufferConfig.IsLittleEndian);
+            case ByteType.UInt24:
+                UInt24_1.UInt24.write(dataView, offSet, value, BufferConfig.IsLittleEndian);
                 return 3;
-            case ByteType.Int24:
+            case ByteType.Int24Array:
                 return Buffer.writeInt24Array(dataView, offSet, value);
-            case ByteType.Int24:
+            case ByteType.UInt24Array:
                 return Buffer.writeUInt24Array(dataView, offSet, value);
+            default:
+                throw new TypeError("没有这种类型");
         }
     }
     static writeInt24Array(dataView, offSet, array = []) {
@@ -386,7 +390,7 @@ class Buffer {
         dataView.setUint8(offSet, arrayLength);
         offSet++;
         for (var i = 0; i < arrayLength; i++) {
-            Int24_1.Int24.write(dataView.buffer, offSet, array[i], BufferConfig.IsLittleEndian);
+            Int24_1.Int24.write(dataView, offSet, array[i], BufferConfig.IsLittleEndian);
             offSet += 3;
         }
         return arrayLength * 3 + 1;
@@ -396,7 +400,7 @@ class Buffer {
         dataView.setUint8(offSet, arrayLength);
         offSet++;
         for (var i = 0; i < arrayLength; i++) {
-            UInt24_1.UInt24.write(dataView.buffer, offSet, array[i], BufferConfig.IsLittleEndian);
+            UInt24_1.UInt24.write(dataView, offSet, array[i], BufferConfig.IsLittleEndian);
             offSet += 3;
         }
         return arrayLength * 3 + 1;
@@ -652,6 +656,8 @@ class Buffer {
                     let length = value.length;
                     return length * 3 + 1;
                 }
+            default:
+                throw new TypeError("没有这种类型");
         }
     }
     static getStringByteLength(str = "") {
