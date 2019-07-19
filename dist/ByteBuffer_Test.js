@@ -15,16 +15,17 @@ console.info(UInt24_1.UInt24.read(dataView, 2, true));
 //#endregion
 //#region  number 类型
 var number24Msg = new Massage_1.Number24Msg();
-number24Msg.Id = -122;
-// number24Msg.Int24Array=[0x7fffff,100,-0x80000]
-// number24Msg.UInt24=0xffffff,
-// number24Msg.UInt24Array=[0xffffff,123345,0];
+number24Msg.Id = Int24_1.Int24.MaxVlaue;
+number24Msg.Int24Array = [0x7fffff, 100, -0x80000];
+number24Msg.UInt24 = 0xffffff,
+    number24Msg.UInt24Array = [0xffffff, 123345, 0];
 var buffer = ByteBuffer_1.Buffer.WirteObject(number24Msg);
-console.info(Int24_1.Int24.read(new DataView(buffer), 0, true));
+console.info(UInt24_1.UInt24.read(new DataView(buffer), 0, true));
 var _number24Msg = ByteBuffer_1.Buffer.ReadObject(Massage_1.Number24Msg, buffer);
-console.info(":" + JSON.stringify(_number24Msg));
+console.info("msg:" + JSON.stringify(_number24Msg));
+console.info("msg:" + JSON.stringify(number24Msg));
 console.info("length:" + buffer.byteLength);
-console.info("json length:" + JSON.stringify(number24Msg).length);
+console.info("json length:" + JSON.stringify(number24Msg));
 //#endregion
 //#region 嵌套类
 var admin = new Massage_1.Role();

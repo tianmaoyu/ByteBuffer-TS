@@ -20,14 +20,24 @@ export class Int24 {
      */
     public static read(dataView: DataView, offset: number, littleEndian: boolean = false): number {
         let number;
-        let buffer=dataView.buffer;
         if (littleEndian) {
-            number= buffer[0 + offset] | (buffer[1 + offset] << 8) | (buffer[2 + offset] << 16)
+            number= dataView.getUint8(0 + offset) | (dataView.getUint8(1 + offset) << 8) | (dataView.getUint8(2 + offset) << 16)
         }
         else {
-            number= buffer[2 + offset] | (buffer[1 + offset] << 8) | (buffer[0 + offset] << 16);
+            number= dataView.getUint8(2 + offset) | (dataView.getUint8(1 + offset) << 8) | (dataView.getUint8(0 + offset) << 16);
         }
         return number & 0x800000 ? number - 0x1000000 : number;
+
+
+        // let number;
+        // let buffer=dataView.buffer;
+        // if (littleEndian) {
+        //     number= buffer[0 + offset] | (buffer[1 + offset] << 8) | (buffer[2 + offset] << 16)
+        // }
+        // else {
+        //     number= buffer[2 + offset] | (buffer[1 + offset] << 8) | (buffer[0 + offset] << 16);
+        // }
+        // return number & 0x800000 ? number - 0x1000000 : number;
     }
 
 
@@ -39,16 +49,38 @@ export class Int24 {
      * @param littleEndian 默认大端
      */
     public static write(dataView: DataView, offset: number,value: number,  littleEndian: boolean = false) {
-        let buffer=dataView.buffer;
+     
         if (littleEndian) {
-            buffer[0 + offset] = value & 0xff;
-            buffer[1 + offset] = (value & 0xff00) >> 8;
-            buffer[2 + offset] = (value & 0xff0000) >> 16;
+            var uint8  = value & 0xff;
+            dataView.setUint8(offset, uint8);
+
+            var uint8  =(value & 0xff00) >> 8;
+            dataView.setUint8(offset+1, uint8);
+
+            var uint8  =(value & 0xff0000) >> 16;
+            dataView.setUint8(offset+2, uint8);
+          
         } else {
-            buffer[2 + offset] = value & 0xff;
-            buffer[1 + offset] = (value & 0xff00) >> 8;
-            buffer[0 + offset] = (value & 0xff0000) >> 16;
+            var uint8  = value & 0xff;
+            dataView.setUint8(offset+2, uint8);
+
+            var uint8  =(value & 0xff00) >> 8;
+            dataView.setUint8(offset+1, uint8);
+
+            var uint8  =(value & 0xff0000) >> 16;
+            dataView.setUint8(offset, uint8);
         }
+       
+        // let buffer=dataView.buffer;
+        // if (littleEndian) {
+        //     buffer[0 + offset] = value & 0xff;
+        //     buffer[1 + offset] = (value & 0xff00) >> 8;
+        //     buffer[2 + offset] = (value & 0xff0000) >> 16;
+        // } else {
+        //     buffer[2 + offset] = value & 0xff;
+        //     buffer[1 + offset] = (value & 0xff00) >> 8;
+        //     buffer[0 + offset] = (value & 0xff0000) >> 16;
+        // }
     }
 
 }

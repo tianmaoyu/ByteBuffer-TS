@@ -23,17 +23,18 @@ console.info(UInt24.read(dataView,2,true))
 //#region  number 类型
 
 var number24Msg=new Number24Msg();
-number24Msg.Id=-122;
-// number24Msg.Int24Array=[0x7fffff,100,-0x80000]
-// number24Msg.UInt24=0xffffff,
-// number24Msg.UInt24Array=[0xffffff,123345,0];
+number24Msg.Id=Int24.MaxVlaue;
+number24Msg.Int24Array=[0x7fffff,100,-0x80000]
+number24Msg.UInt24=0xffffff,
+number24Msg.UInt24Array=[0xffffff,123345,0];
 
 var buffer=Buffer.WirteObject(number24Msg);
-console.info(Int24.read(new DataView(buffer),0,true));
+console.info(UInt24.read(new DataView(buffer),0,true));
 var _number24Msg= Buffer.ReadObject(Number24Msg,buffer);
-console.info(":"+ JSON.stringify(_number24Msg))
+console.info("msg:"+ JSON.stringify(_number24Msg))
+console.info("msg:"+ JSON.stringify(number24Msg))
 console.info("length:"+ buffer.byteLength)
-console.info("json length:"+ JSON.stringify(number24Msg).length)
+console.info("json length:"+ JSON.stringify(number24Msg))
 //#endregion
 
 

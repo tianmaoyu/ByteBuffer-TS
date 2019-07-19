@@ -113,6 +113,18 @@ __decorate([
     ByteBuffer_1.ByteMember(7, ByteBuffer_1.ByteType.Int24),
     __metadata("design:type", Number)
 ], Number24Msg.prototype, "Id", void 0);
+__decorate([
+    ByteBuffer_1.ByteMember(8, ByteBuffer_1.ByteType.Int24Array),
+    __metadata("design:type", Array)
+], Number24Msg.prototype, "Int24Array", void 0);
+__decorate([
+    ByteBuffer_1.ByteMember(9, ByteBuffer_1.ByteType.UInt24),
+    __metadata("design:type", Number)
+], Number24Msg.prototype, "UInt24", void 0);
+__decorate([
+    ByteBuffer_1.ByteMember(10, ByteBuffer_1.ByteType.UInt24Array),
+    __metadata("design:type", Array)
+], Number24Msg.prototype, "UInt24Array", void 0);
 Number24Msg = __decorate([
     ByteBuffer_1.BtyeContract
 ], Number24Msg);
