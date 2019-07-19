@@ -61,3 +61,27 @@ console.info(JSON.stringify(_user));
  ```
 ## 
 
+## Int24 类型的支持
+```Typescript
+//#region  number 类型
+var number24Msg=new Number24Msg();
+number24Msg.Id=0x7fffff;
+number24Msg.Int24Array=[0x7fffff,100,-0x800000]
+number24Msg.UInt24=0xffffff,
+number24Msg.UInt24Array=[0xffffff,123345,0];
+
+var buffer=Buffer.WirteObject(number24Msg);
+var _number24Msg= Buffer.ReadObject(Number24Msg,buffer);
+console.info("msg:"+ JSON.stringify(_number24Msg))
+console.info("msg:"+ JSON.stringify(number24Msg))
+console.info("length:"+ buffer.byteLength)
+console.info("json length:"+ JSON.stringify(number24Msg).length)
+//#endregion
+```
+>output
+```
+msg:{"Id":8388607,"Int24Array":[8388607,100,-8388608],"UInt24":16777215,"UInt24Array":[16777215,123345,0]}
+msg:{"Id":8388607,"Int24Array":[8388607,100,-8388608],"UInt24":16777215,"UInt24Array":[16777215,123345,0]}
+length:26
+json length:102
+```

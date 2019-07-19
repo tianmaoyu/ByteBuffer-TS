@@ -1,40 +1,22 @@
 
 import { ComplexMsg, User, Role, ServerMsgType, Number24Msg } from './Massage';
 import { Buffer } from './ByteBuffer';
-import { Int24 } from './Int24';
-import { UInt24 } from './UInt24';
-
-
-
-
-//#region  INT24
-var dataView=new DataView(new ArrayBuffer(32));
-dataView.setInt16(0,100,true);
-console.info(dataView.getInt16(0,true))
-Int24.write(dataView,2,Int24.MaxVlaue,true);
-console.info(Int24.read(dataView,2,true)) 
-
-UInt24.write(dataView,2,Int24.MaxVlaue,true);
-console.info(UInt24.read(dataView,2,true)) 
-//#endregion
 
 
 
 //#region  number 类型
-
 var number24Msg=new Number24Msg();
-number24Msg.Id=Int24.MaxVlaue;
-number24Msg.Int24Array=[0x7fffff,100,-0x80000]
+number24Msg.Id=0x7fffff;
+number24Msg.Int24Array=[0x7fffff,100,-0x800000]
 number24Msg.UInt24=0xffffff,
 number24Msg.UInt24Array=[0xffffff,123345,0];
 
 var buffer=Buffer.WirteObject(number24Msg);
-console.info(UInt24.read(new DataView(buffer),0,true));
 var _number24Msg= Buffer.ReadObject(Number24Msg,buffer);
 console.info("msg:"+ JSON.stringify(_number24Msg))
 console.info("msg:"+ JSON.stringify(number24Msg))
 console.info("length:"+ buffer.byteLength)
-console.info("json length:"+ JSON.stringify(number24Msg))
+console.info("json length:"+ JSON.stringify(number24Msg).length)
 //#endregion
 
 
