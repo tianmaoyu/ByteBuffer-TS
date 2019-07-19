@@ -430,7 +430,7 @@ export class Buffer {
 
     }
 
-    private static writeInt24Array(dataView: DataView, offSet: number, array: Array<number>): number {
+    private static writeInt24Array(dataView: DataView, offSet: number, array: Array<number>=[]): number {
         var arrayLength = array.length;
         dataView.setUint8(offSet, arrayLength);
         offSet++;
@@ -441,7 +441,7 @@ export class Buffer {
         return arrayLength * 3 + 1;
     }
 
-    private static writeUInt24Array(dataView: DataView, offSet: number, array: Array<number>): number {
+    private static writeUInt24Array(dataView: DataView, offSet: number, array: Array<number>=[]): number {
         var arrayLength = array.length;
         dataView.setUint8(offSet, arrayLength);
         offSet++;
@@ -624,7 +624,7 @@ export class Buffer {
      */
     public static GetObjectByteLength(obj: Object) {
         var objectLength = 0;
-        if (obj === null || obj === undefined) {
+        if ( obj === undefined ||obj === null ) {
             return objectLength;
         }
         var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
@@ -639,8 +639,8 @@ export class Buffer {
 
 
     /**
-     * 得到 属性 二进制 长度
-     * 如果是数组，
+     * 得到 属性 二进制 长度,基础类型是占多少长度就多少长度
+     * 如果是数组，为空或者 长度为0 使用一个字节标识
      * @param type 
      * @param value 
      */
@@ -720,11 +720,11 @@ export class Buffer {
 
     }
    
-    private static getStringByteLength(str: string): number {
+    private static getStringByteLength(str: string=""): number {
         return str.length * 2 + 1;//
     }
 
-    private static getStringArrayByteLength(strArray: Array<string>): number {
+    private static getStringArrayByteLength(strArray: Array<string>=[]): number {
         var length = 0
         for (var i = 0; i < strArray.length; i++) {
             length += Buffer.getStringByteLength(strArray[i]);
@@ -732,7 +732,7 @@ export class Buffer {
         return length + 1;
     }
 
-    private static getObjectArrayByteLength(objArray: Array<object>) {
+    private static getObjectArrayByteLength(objArray: Array<object>=[]) {
         var length = 0;
         for (var i = 0; i < objArray.length; i++) {
             length += Buffer.GetObjectByteLength(objArray[i]);
@@ -806,7 +806,6 @@ export enum ByteType {
     UInt24 = 32,
     Int24Array = 33,
     UInt24Array = 34,
-
 }
 
 
