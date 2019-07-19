@@ -88,13 +88,13 @@ export class Buffer {
             case ByteType.Bool:
                 object[propertyKey] = dataView.getInt8(offSet) == 1;
                 return 1;
-            case ByteType.Uint8:
+            case ByteType.UInt8:
                 object[propertyKey] = dataView.getUint8(offSet);
                 return 1;
             case ByteType.Int8:
                 object[propertyKey] = dataView.getInt8(offSet);
                 return 1;
-            case ByteType.Uint16:
+            case ByteType.UInt16:
                 object[propertyKey] = dataView.getUint16(offSet, true);
                 return 2;
             case ByteType.Int16:
@@ -121,7 +121,7 @@ export class Buffer {
                 return Buffer.readUint8Array(dataView, offSet, object, propertyKey);
             case ByteType.Int8Array:
                 return Buffer.readInt8Array(dataView, offSet, object, propertyKey);
-            case ByteType.Uint16Array:
+            case ByteType.UInt16Array:
                 return Buffer.readUint16Array(dataView, offSet, object, propertyKey);
             case ByteType.Int16Array:
                 return Buffer.readInt16Array(dataView, offSet, object, propertyKey);
@@ -367,13 +367,13 @@ export class Buffer {
             case ByteType.Bool:
                 dataView.setInt8(offSet, (value as Boolean) ? 1 : 0)
                 return 1;
-            case ByteType.Uint8:
+            case ByteType.UInt8:
                 dataView.setUint8(offSet, value as number)
                 return 1;
             case ByteType.Int8:
                 dataView.setInt8(offSet, value as number)
                 return 1;
-            case ByteType.Uint16:
+            case ByteType.UInt16:
                 dataView.setUint16(offSet, value as number, true)
                 return 2;
             case ByteType.Int16:
@@ -400,7 +400,7 @@ export class Buffer {
                 return Buffer.writeUint8Array(dataView, offSet, value as Array<number>);
             case ByteType.Int8Array:
                 return Buffer.writeInt8Array(dataView, offSet, value as Array<number>);
-            case ByteType.Uint16Array:
+            case ByteType.UInt16Array:
                 return Buffer.writeUint16Array(dataView, offSet, value as Array<number>);
             case ByteType.Int16Array:
                 return Buffer.writeInt16Array(dataView, offSet, value as Array<number>);
@@ -648,11 +648,11 @@ export class Buffer {
         switch (type) {
             case ByteType.Bool:
                 return 1;
-            case ByteType.Uint8:
+            case ByteType.UInt8:
                 return 1;
             case ByteType.Int8:
                 return 1;
-            case ByteType.Uint16:
+            case ByteType.UInt16:
                 return 2;
             case ByteType.Int16:
                 return 2;
@@ -681,7 +681,7 @@ export class Buffer {
                     let length = (value as Array<number>).length;
                     return  length + 1;
                 }
-            case ByteType.Uint16Array:
+            case ByteType.UInt16Array:
             case ByteType.Int16Array:
                 {
                     if (value == null) return 1;
@@ -778,11 +778,11 @@ export function BtyeContract(target: any) {
 export enum ByteType {
     Bool = 0,
     Int8 = 1,
-    Uint8 = 2,
+    UInt8 = 2,
     Int16 = 3,
-    Uint16 = 4,
+    UInt16 = 4,
     Int32 = 5,
-    Uint32 = 6,
+    UInt32 = 6,
     Float32 = 7,
     Float64 = 8,
     String = 9,
@@ -793,9 +793,9 @@ export enum ByteType {
     Int8Array = 20,
     UInt8Array = 21,
     Int16Array = 23,
-    Uint16Array = 24,
+    UInt16Array = 24,
     Int32Array = 25,
-    Uint32Array = 26,
+    UInt32Array = 26,
     Float32Array = 27,
     Float64Array = 28,
     StringArray = 29,

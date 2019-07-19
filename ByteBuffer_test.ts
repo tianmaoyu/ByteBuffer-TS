@@ -1,11 +1,49 @@
 
-import { Msg, User, Role, MessageType } from './Massage';
+import { Msg, User, Role, ServerMsgType } from './Massage';
 import { Buffer } from './ByteBuffer';
 import { UTF8 } from './UTF8';
 import { Int24 } from './Int24';
 import { UInt24 } from './UInt24';
 import { DataView2 } from './DataView2';
 import { UTF16 } from './UTF16';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 var buffer=new ArrayBuffer(100);
 var str1="werksdfksl2356789!@$%^&*()sdfhjkj";
@@ -46,7 +84,7 @@ dataView2.getUTF8String
 
 
 var msg = new Msg();//sss
-msg.MessageType = MessageType.move;
+msg.MessageType = ServerMsgType.move;
 msg.Address = "深圳";
 msg.Bool = false;
 msg.Name = "eric";
