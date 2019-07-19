@@ -23,17 +23,6 @@ export interface ClientMsg{
     MessageType:ServerMsgType;
 }
 
-
-@BtyeContract
-export class User {
-    @ByteMember(1, ByteType.UInt16)
-    public Id: number ;
-    @ByteMember(2, ByteType.String)
-    public Name: String ;
-    @ByteMember(3, ByteType.Int32Array)
-    public IdList: number[];
-}
-
 /**测试 */
 @BtyeContract
 export class Role {
@@ -44,10 +33,19 @@ export class Role {
 }
 
 
+@BtyeContract
+export class User {
+    @ByteMember(1, ByteType.UInt16)
+    public Id: number ;
+    @ByteMember(2, ByteType.String)
+    public Name: String ;
+    @ByteMember(3, ByteType.ObjectArray,Role)
+    public RoleList: Array<Role>;
+}
 
 
 @BtyeContract
-export class Msg implements ServerMsg {
+export class ComplexMsg implements ServerMsg {
 
     @ByteMember(1, ByteType.UInt8)
     public MessageType: ServerMsgType = ServerMsgType.join;
@@ -84,7 +82,7 @@ export class Msg implements ServerMsg {
 
 
 @BtyeContract
-export class Massage {
+export class NumberMsg {
 
     @ByteMember(1, ByteType.Bool)
     public Bool: boolean;
@@ -96,43 +94,40 @@ export class Massage {
     @ByteMember(4, ByteType.UInt8Array)
     public UInt8Array: Array<number>;
 
-
-
+    @ByteMember(5, ByteType.UInt16)
+    public UInt16: number;
+    @ByteMember(6, ByteType.UInt16Array)
+    public UInt16Array: Array<number>;
    
+    @ByteMember(7, ByteType.Int24)
+    public Int24: number;
+    @ByteMember(8, ByteType.Int24Array)
+    public Int24Array: Array<number>;
 
-    @ByteMember(2, ByteType.UInt16)
-    public Id: number = 0;
-    @ByteMember(2, ByteType.UInt16Array)
-    public IdList: Array<number>;
-
-
-
-   
-    @ByteMember(3, ByteType)
-    public Bool: boolean;
-
+    @ByteMember(9, ByteType.UInt24)
+    public UInt24: number;
+    @ByteMember(10, ByteType.UInt24Array)
+    public UInt24Array: Array<number>;
+}
 
 
-    @ByteMember(4, ByteType.String)
-    public Name: string;
+@BtyeContract
+export class StringMsg {
 
-    @ByteMember(5, ByteType.String)
-    public Address: string ;
+    @ByteMember(1, ByteType.String)
+    public String: string;
+    @ByteMember(2, ByteType.StringArray)
+    public StringArray: string ;
 
-    @ByteMember(6, ByteType.Object, User)
-    public User: User ;
+}
 
-    @ByteMember(7, ByteType.UInt8Array)
-    public IdList: number[];
-   
-    @ByteMember(8, ByteType.Int32Array)
-    public IdList2: number[];
 
-    @ByteMember(9, ByteType.ObjectArray, User)
-    public UserList:Array<User>;
-    @ByteMember(10, ByteType.BoolArray)
-    public BoolList:Array<boolean>;
+@BtyeContract
+export class ObjectMsg {
 
-    @ByteMember(11, ByteType.Bool)
-    public IsVip:boolean;
+    @ByteMember(0, ByteType.Object, User)
+    public Object: User ;
+    @ByteMember(1, ByteType.ObjectArray, User)
+    public ObjectArray:Array<User>;
+    
 }

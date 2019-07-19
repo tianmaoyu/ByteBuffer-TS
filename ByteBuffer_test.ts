@@ -1,5 +1,5 @@
 
-import { Msg, User, Role, ServerMsgType } from './Massage';
+import { ComplexMsg, User, Role, ServerMsgType } from './Massage';
 import { Buffer } from './ByteBuffer';
 import { UTF8 } from './UTF8';
 import { Int24 } from './Int24';
@@ -83,7 +83,7 @@ var dataView2=new DataView2(buffer);
 dataView2.getUTF8String
 
 
-var msg = new Msg();//sss
+var msg = new ComplexMsg();//sss
 msg.MessageType = ServerMsgType.move;
 msg.Address = "深圳";
 msg.Bool = false;
@@ -92,7 +92,7 @@ msg.Id = 1000;
 var user=new User();
 user.Id=1;
 user.Name="user"
-user.IdList=[1,2,3,4,5];
+// user.IdList=[1,2,3,4,5];
 msg.User=user;
 var user2=new User();
 user2.Id=2;
@@ -109,7 +109,7 @@ var buffer = Buffer.WirteObject(msg);
 console.info(buffer.byteLength);
 
 console.info(JSON.stringify(msg).length) ;
-var msg1 = Buffer.ReadObject(Msg, buffer);
+var msg1 = Buffer.ReadObject(ComplexMsg, buffer);
 
 console.info(msg1);
 
@@ -124,7 +124,7 @@ console.info("json 耗时间："+ (time1_2-time1_1));
 var time2_1=new Date().getTime();
 for(let i=0;i<100000;i++){
     let bytes = Buffer.WirteObject(msg);
-    let obj= Buffer.ReadObject(Msg,bytes);
+    let obj= Buffer.ReadObject(ComplexMsg,bytes);
 }
 var time2_2=new Date().getTime();
 console.info("byteBuffer 耗时间："+ (time2_2-time2_1));
