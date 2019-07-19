@@ -69,13 +69,13 @@ class Buffer {
             case ByteType.Bool:
                 object[propertyKey] = dataView.getInt8(offSet) == 1;
                 return 1;
-            case ByteType.Uint8:
+            case ByteType.UInt8:
                 object[propertyKey] = dataView.getUint8(offSet);
                 return 1;
             case ByteType.Int8:
                 object[propertyKey] = dataView.getInt8(offSet);
                 return 1;
-            case ByteType.Uint16:
+            case ByteType.UInt16:
                 object[propertyKey] = dataView.getUint16(offSet, true);
                 return 2;
             case ByteType.Int16:
@@ -101,7 +101,7 @@ class Buffer {
                 return Buffer.readUint8Array(dataView, offSet, object, propertyKey);
             case ByteType.Int8Array:
                 return Buffer.readInt8Array(dataView, offSet, object, propertyKey);
-            case ByteType.Uint16Array:
+            case ByteType.UInt16Array:
                 return Buffer.readUint16Array(dataView, offSet, object, propertyKey);
             case ByteType.Int16Array:
                 return Buffer.readInt16Array(dataView, offSet, object, propertyKey);
@@ -322,13 +322,13 @@ class Buffer {
             case ByteType.Bool:
                 dataView.setInt8(offSet, value ? 1 : 0);
                 return 1;
-            case ByteType.Uint8:
+            case ByteType.UInt8:
                 dataView.setUint8(offSet, value);
                 return 1;
             case ByteType.Int8:
                 dataView.setInt8(offSet, value);
                 return 1;
-            case ByteType.Uint16:
+            case ByteType.UInt16:
                 dataView.setUint16(offSet, value, true);
                 return 2;
             case ByteType.Int16:
@@ -354,7 +354,7 @@ class Buffer {
                 return Buffer.writeUint8Array(dataView, offSet, value);
             case ByteType.Int8Array:
                 return Buffer.writeInt8Array(dataView, offSet, value);
-            case ByteType.Uint16Array:
+            case ByteType.UInt16Array:
                 return Buffer.writeUint16Array(dataView, offSet, value);
             case ByteType.Int16Array:
                 return Buffer.writeInt16Array(dataView, offSet, value);
@@ -381,7 +381,7 @@ class Buffer {
                 return Buffer.writeUInt24Array(dataView, offSet, value);
         }
     }
-    static writeInt24Array(dataView, offSet, array) {
+    static writeInt24Array(dataView, offSet, array = []) {
         var arrayLength = array.length;
         dataView.setUint8(offSet, arrayLength);
         offSet++;
@@ -391,7 +391,7 @@ class Buffer {
         }
         return arrayLength * 3 + 1;
     }
-    static writeUInt24Array(dataView, offSet, array) {
+    static writeUInt24Array(dataView, offSet, array = []) {
         var arrayLength = array.length;
         dataView.setUint8(offSet, arrayLength);
         offSet++;
@@ -558,7 +558,7 @@ class Buffer {
      */
     static GetObjectByteLength(obj) {
         var objectLength = 0;
-        if (obj === null || obj === undefined) {
+        if (obj === undefined || obj === null) {
             return objectLength;
         }
         var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
@@ -570,8 +570,8 @@ class Buffer {
         return objectLength;
     }
     /**
-     * 得到 属性 二进制 长度
-     * 如果是数组，
+     * 得到 属性 二进制 长度,基础类型是占多少长度就多少长度
+     * 如果是数组，为空或者 长度为0 使用一个字节标识
      * @param type
      * @param value
      */
@@ -579,11 +579,11 @@ class Buffer {
         switch (type) {
             case ByteType.Bool:
                 return 1;
-            case ByteType.Uint8:
+            case ByteType.UInt8:
                 return 1;
             case ByteType.Int8:
                 return 1;
-            case ByteType.Uint16:
+            case ByteType.UInt16:
                 return 2;
             case ByteType.Int16:
                 return 2;
@@ -613,7 +613,7 @@ class Buffer {
                     let length = value.length;
                     return length + 1;
                 }
-            case ByteType.Uint16Array:
+            case ByteType.UInt16Array:
             case ByteType.Int16Array:
                 {
                     if (value == null)
@@ -654,17 +654,17 @@ class Buffer {
                 }
         }
     }
-    static getStringByteLength(str) {
+    static getStringByteLength(str = "") {
         return str.length * 2 + 1; //
     }
-    static getStringArrayByteLength(strArray) {
+    static getStringArrayByteLength(strArray = []) {
         var length = 0;
         for (var i = 0; i < strArray.length; i++) {
             length += Buffer.getStringByteLength(strArray[i]);
         }
         return length + 1;
     }
-    static getObjectArrayByteLength(objArray) {
+    static getObjectArrayByteLength(objArray = []) {
         var length = 0;
         for (var i = 0; i < objArray.length; i++) {
             length += Buffer.GetObjectByteLength(objArray[i]);
@@ -716,11 +716,11 @@ var ByteType;
 (function (ByteType) {
     ByteType[ByteType["Bool"] = 0] = "Bool";
     ByteType[ByteType["Int8"] = 1] = "Int8";
-    ByteType[ByteType["Uint8"] = 2] = "Uint8";
+    ByteType[ByteType["UInt8"] = 2] = "UInt8";
     ByteType[ByteType["Int16"] = 3] = "Int16";
-    ByteType[ByteType["Uint16"] = 4] = "Uint16";
+    ByteType[ByteType["UInt16"] = 4] = "UInt16";
     ByteType[ByteType["Int32"] = 5] = "Int32";
-    ByteType[ByteType["Uint32"] = 6] = "Uint32";
+    ByteType[ByteType["UInt32"] = 6] = "UInt32";
     ByteType[ByteType["Float32"] = 7] = "Float32";
     ByteType[ByteType["Float64"] = 8] = "Float64";
     ByteType[ByteType["String"] = 9] = "String";
@@ -730,9 +730,9 @@ var ByteType;
     ByteType[ByteType["Int8Array"] = 20] = "Int8Array";
     ByteType[ByteType["UInt8Array"] = 21] = "UInt8Array";
     ByteType[ByteType["Int16Array"] = 23] = "Int16Array";
-    ByteType[ByteType["Uint16Array"] = 24] = "Uint16Array";
+    ByteType[ByteType["UInt16Array"] = 24] = "UInt16Array";
     ByteType[ByteType["Int32Array"] = 25] = "Int32Array";
-    ByteType[ByteType["Uint32Array"] = 26] = "Uint32Array";
+    ByteType[ByteType["UInt32Array"] = 26] = "UInt32Array";
     ByteType[ByteType["Float32Array"] = 27] = "Float32Array";
     ByteType[ByteType["Float64Array"] = 28] = "Float64Array";
     ByteType[ByteType["StringArray"] = 29] = "StringArray";
