@@ -19,15 +19,22 @@ export class Int24 {
      * @param littleEndian 
      */
     public static read(dataView: DataView, offset: number, littleEndian: boolean = false): number {
-        let number;
+        // let number;
+        // if (littleEndian) {
+        //     number= dataView.getUint8(0 + offset) | (dataView.getUint8(1 + offset) << 8) | (dataView.getUint8(2 + offset) << 16)
+        // }
+        // else {
+        //     number= dataView.getUint8(2 + offset) | (dataView.getUint8(1 + offset) << 8) | (dataView.getUint8(0 + offset) << 16);
+        // }
+        // return number & 0x800000 ? number - 0x1000000 : number;
+
+        //另写发，没验证过
         if (littleEndian) {
-            number= dataView.getUint8(0 + offset) | (dataView.getUint8(1 + offset) << 8) | (dataView.getUint8(2 + offset) << 16)
+            return dataView.getUint8(0 + offset) | (dataView.getUint8(1 + offset) << 8) | (dataView.getInt8(2 + offset) << 16)
         }
         else {
-            number= dataView.getUint8(2 + offset) | (dataView.getUint8(1 + offset) << 8) | (dataView.getUint8(0 + offset) << 16);
+            return dataView.getInt8(2 + offset) | (dataView.getUint8(1 + offset) << 8) | (dataView.getUint8(0 + offset) << 16);
         }
-        return number & 0x800000 ? number - 0x1000000 : number;
-
 
         // let number;
         // let buffer=dataView.buffer;
