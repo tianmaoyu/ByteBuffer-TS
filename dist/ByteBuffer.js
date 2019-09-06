@@ -44,6 +44,9 @@ class ByteInfo {
     }
 }
 exports.ByteInfo = ByteInfo;
+class MultipleObject {
+}
+exports.MultipleObject = MultipleObject;
 class Buffer {
     //#region read method
     /**
@@ -62,6 +65,26 @@ class Buffer {
             offSet += byteLength;
         }
         return object;
+    }
+    /**
+     * 从连包（多个数据包）中读取数据
+     * @param classType
+     * @param buffer
+     * @param offSet
+     */
+    static ReadObjectMultiple(classType, buffer, offSet = 0) {
+        var object = new classType.prototype.constructor(); //也可以 new (<any>classType())
+        var dataView = new DataView(buffer);
+        var byteInfoArray = Buffer.ClassInfoMap.get(classType.prototype["objkey"]);
+        for (let i = 0; i < byteInfoArray.length; i++) {
+            let byteInfo = byteInfoArray[i];
+            let byteLength = this.readProperty(dataView, offSet, byteInfo, object, byteInfo.PropertyKey);
+            offSet += byteLength;
+        }
+        var result = new MultipleObject();
+        result.Data = object;
+        result.OffSet = offSet;
+        return result;
     }
     static readProperty(dataView, offSet, byteInfo, object, propertyKey) {
         var type = byteInfo.Type;

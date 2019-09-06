@@ -20,6 +20,57 @@ import { Buffer } from './ByteBuffer';
 //#endregion
 
 
+
+//#包的合并，和拆包
+var admin=new Role();
+admin.Id=0;
+admin.Name="Administrator/管理员";
+var adminBuffer= Buffer.WirteObject(admin)
+var adminDataView=new DataView(adminBuffer);
+
+var guest=new Role();
+guest.Id=1;
+guest.Name="guest/游客"
+var guestBuffer= Buffer.WirteObject(guest)
+var guestDataView=new DataView(guestBuffer);
+
+var allBuffer=new ArrayBuffer(adminBuffer.byteLength+guestBuffer.byteLength)
+var dataView = new DataView(allBuffer);
+
+var allIndex=0;
+for (let index = 0; index < adminDataView.byteLength; index++) {
+    dataView.setInt8(allIndex,adminDataView.getInt8(index));
+    allIndex++;
+}
+for (let index = 0; index < guestDataView.byteLength; index++) {
+    dataView.setInt8(allIndex,guestDataView.getInt8(index));
+    allIndex++;
+}
+
+var role1= Buffer.ReadObjectMultiple<Role>(Role,allBuffer,0);
+console.info(role1.Data);
+if(allBuffer.byteLength>role1.OffSet)
+var role2= Buffer.ReadObjectMultiple<Role>(Role,allBuffer,role1.OffSet);
+console.info(role2.Data);
+if(allBuffer.byteLength>=role2.OffSet){
+    console.info("读取完毕")
+}
+
+
+
+var user=new User();
+user.Id=200;
+user.Name="5156村长";
+user.RoleList=new Array<Role>();
+user.RoleList.push(admin);
+user.RoleList.push(guest);
+
+var arrayBuffer= Buffer.WirteObject(user);
+var _user=Buffer.ReadObject<User>(User,arrayBuffer);
+console.info(JSON.stringify(_user));
+console.info("byteBuffer:"+arrayBuffer.byteLength);
+console.info("json:"+JSON.stringify(user).length);
+
 //#region 嵌套类
 var admin=new Role();
 admin.Id=0;

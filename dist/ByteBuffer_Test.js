@@ -15,6 +15,47 @@ const ByteBuffer_1 = require("./ByteBuffer");
 // console.info("length:"+ buffer.byteLength)
 // console.info("json length:"+ JSON.stringify(number24Msg).length)
 //#endregion
+//#包的合并，和拆包
+var admin = new Massage_1.Role();
+admin.Id = 0;
+admin.Name = "Administrator/管理员";
+var adminBuffer = ByteBuffer_1.Buffer.WirteObject(admin);
+var adminDataView = new DataView(adminBuffer);
+var guest = new Massage_1.Role();
+guest.Id = 1;
+guest.Name = "guest/游客";
+var guestBuffer = ByteBuffer_1.Buffer.WirteObject(guest);
+var guestDataView = new DataView(guestBuffer);
+var allBuffer = new ArrayBuffer(adminBuffer.byteLength + guestBuffer.byteLength);
+var dataView = new DataView(allBuffer);
+var allIndex = 0;
+for (let index = 0; index < adminDataView.byteLength; index++) {
+    dataView.setInt8(allIndex, adminDataView.getInt8(index));
+    allIndex++;
+}
+for (let index = 0; index < guestDataView.byteLength; index++) {
+    dataView.setInt8(allIndex, guestDataView.getInt8(index));
+    allIndex++;
+}
+var role1 = ByteBuffer_1.Buffer.ReadObjectMultiple(Massage_1.Role, allBuffer, 0);
+console.info(role1.Data);
+if (allBuffer.byteLength > role1.OffSet)
+    var role2 = ByteBuffer_1.Buffer.ReadObjectMultiple(Massage_1.Role, allBuffer, role1.OffSet);
+console.info(role2.Data);
+if (allBuffer.byteLength >= role2.OffSet) {
+    console.info("读取完毕");
+}
+var user = new Massage_1.User();
+user.Id = 200;
+user.Name = "5156村长";
+user.RoleList = new Array();
+user.RoleList.push(admin);
+user.RoleList.push(guest);
+var arrayBuffer = ByteBuffer_1.Buffer.WirteObject(user);
+var _user = ByteBuffer_1.Buffer.ReadObject(Massage_1.User, arrayBuffer);
+console.info(JSON.stringify(_user));
+console.info("byteBuffer:" + arrayBuffer.byteLength);
+console.info("json:" + JSON.stringify(user).length);
 //#region 嵌套类
 var admin = new Massage_1.Role();
 admin.Id = 0;

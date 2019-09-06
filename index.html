@@ -8,5 +8,8 @@
     <body>
         <p id="greeting">Loading ...</p>
         <script src="/dist/index.js"></script>
+        <script>
+           String.fromCharCode.apply(null, new Int8Array(event.data))
+        </script>
     </body>
 </html>

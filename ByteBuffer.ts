@@ -50,6 +50,11 @@ export class ByteInfo {
     }
 }
 
+export class MultipleObject<T>{
+    public Data:T;
+    public OffSet:number;
+}
+
 export class Buffer {
 
     /**
@@ -79,6 +84,27 @@ export class Buffer {
             offSet += byteLength;
         }
         return object;
+    }
+
+    /**
+     * 从连包（多个数据包）中读取数据
+     * @param classType 
+     * @param buffer 
+     * @param offSet 
+     */
+    public static ReadObjectMultiple<T>(classType: Function, buffer: ArrayBuffer,offSet:number=0): MultipleObject<T> {
+        var object = new classType.prototype.constructor();//也可以 new (<any>classType())
+        var dataView = new DataView(buffer);
+        var byteInfoArray = Buffer.ClassInfoMap.get(classType.prototype["objkey"]);
+        for (let i = 0; i < byteInfoArray.length; i++) {
+            let byteInfo = byteInfoArray[i];
+            let byteLength = this.readProperty(dataView, offSet, byteInfo, object, byteInfo.PropertyKey);
+            offSet += byteLength;
+        }
+        var result=new MultipleObject<T>();
+        result.Data=object;
+        result.OffSet=offSet;
+        return result;
     }
 
 
