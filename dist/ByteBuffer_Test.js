@@ -3,17 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Massage_1 = require("./Massage");
 const ByteBuffer_1 = require("./ByteBuffer");
 //#region  number 类型
-var number24Msg = new Massage_1.Number24Msg();
-number24Msg.Id = 0x7fffff;
-number24Msg.Int24Array = [0x7fffff, 100, -0x800000];
-number24Msg.UInt24 = 0xffffff,
-    number24Msg.UInt24Array = [0xffffff, 123345, 0];
-var buffer = ByteBuffer_1.Buffer.WirteObject(number24Msg);
-var _number24Msg = ByteBuffer_1.Buffer.ReadObject(Massage_1.Number24Msg, buffer);
-console.info("msg:" + JSON.stringify(_number24Msg));
-console.info("msg:" + JSON.stringify(number24Msg));
-console.info("length:" + buffer.byteLength);
-console.info("json length:" + JSON.stringify(number24Msg).length);
+// var number24Msg=new Number24Msg();
+// number24Msg.Id=0x7fffff;
+// number24Msg.Int24Array=[0x7fffff,100,-0x800000]
+// number24Msg.UInt24=0xffffff,
+// number24Msg.UInt24Array=[0xffffff,123345,0];
+// var buffer=Buffer.WirteObject(number24Msg);
+// var _number24Msg= Buffer.ReadObject(Number24Msg,buffer);
+// console.info("msg:"+ JSON.stringify(_number24Msg))
+// console.info("msg:"+ JSON.stringify(number24Msg))
+// console.info("length:"+ buffer.byteLength)
+// console.info("json length:"+ JSON.stringify(number24Msg).length)
 //#endregion
 //#region 嵌套类
 var admin = new Massage_1.Role();
@@ -44,10 +44,14 @@ msg.Id = 1000;
 var user = new Massage_1.User();
 user.Id = 1;
 user.Name = "user";
+// user.RoleList=[];
+// user.RoleList.push(admin)
 msg.User = user;
 var user2 = new Massage_1.User();
 user2.Id = 2;
 user2.Name = "use1";
+// user2.RoleList=[];
+// user.RoleList.push(admin);
 msg.UserList = [];
 msg.UserList.push(user2);
 msg.UserList.push(user);

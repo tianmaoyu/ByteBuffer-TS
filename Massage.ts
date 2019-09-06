@@ -26,7 +26,7 @@ export interface ClientMsg{
 /**测试 */
 @BtyeContract
 export class Role {
-    @ByteMember(1, ByteType.UInt16)
+    @ByteMember(1, ByteType.UInt16,null,"Role")
     public Id: number;
     @ByteMember(2, ByteType.String)
     public Name: string;
@@ -35,7 +35,7 @@ export class Role {
 
 @BtyeContract
 export class User {
-    @ByteMember(1, ByteType.UInt16)
+    @ByteMember(1, ByteType.UInt16,null,"User")
     public Id: number ;
     @ByteMember(2, ByteType.String)
     public Name: String ;
@@ -47,7 +47,7 @@ export class User {
 @BtyeContract
 export class ComplexMsg implements ServerMsg {
 
-    @ByteMember(1, ByteType.UInt8)
+    @ByteMember(1, ByteType.UInt8,null,"ComplexMsg")
     public MessageType: ServerMsgType = ServerMsgType.join;
 
     @ByteMember(2, ByteType.UInt16)
@@ -83,7 +83,7 @@ export class ComplexMsg implements ServerMsg {
 @BtyeContract
 export class Number24Msg {
 
-    @ByteMember(7, ByteType.Int24)
+    @ByteMember(7, ByteType.Int24,null,"Number24Msg")
     public Id: number;
     @ByteMember(8, ByteType.Int24Array)
     public Int24Array: Array<number>;
@@ -97,7 +97,7 @@ export class Number24Msg {
 @BtyeContract
 export class NumberMsg {
 
-    @ByteMember(1, ByteType.Bool)
+    @ByteMember(1, ByteType.Bool,null,"NumberMsg")
     public Bool: boolean;
     @ByteMember(2, ByteType.BoolArray)
     public BoolArray: boolean[];
@@ -127,7 +127,7 @@ export class NumberMsg {
 @BtyeContract
 export class StringMsg {
 
-    @ByteMember(1, ByteType.String)
+    @ByteMember(1, ByteType.String,null,"StringMsg")
     public String: string;
     @ByteMember(2, ByteType.StringArray)
     public StringArray: string ;
@@ -138,7 +138,7 @@ export class StringMsg {
 @BtyeContract
 export class ObjectMsg {
 
-    @ByteMember(0, ByteType.Object, User)
+    @ByteMember(0, ByteType.Object, User,"ObjectMsg")
     public Object: User ;
     @ByteMember(1, ByteType.ObjectArray, User)
     public ObjectArray:Array<User>;

@@ -305,7 +305,7 @@ class Buffer {
         var offSet = 0;
         var cacheBuffer = new ArrayBuffer(128);
         var dataView = new DataView(cacheBuffer);
-        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
+        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.prototype["objkey"]);
         for (let i = 0; i < byteInfoArray.length; i++) {
             let byteInfo = byteInfoArray[i];
             let byteLength = this.writeProperty(dataView, offSet, byteInfo.Type, obj[byteInfo.PropertyKey]);
@@ -495,7 +495,7 @@ class Buffer {
         var totalLength = Buffer.GetObjectByteLength(obj);
         dataView.setUint8(offSet, totalLength);
         offSet++;
-        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
+        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.prototype["objkey"]);
         for (let i = 0; i < byteInfoArray.length; i++) {
             let byteInfo = byteInfoArray[i];
             let byteLength = Buffer.writeProperty(dataView, offSet, byteInfo.Type, obj[byteInfo.PropertyKey]);
@@ -509,7 +509,7 @@ class Buffer {
      * @param offSet
      * @param obj
      */
-    static wirteInnerObjectArray(dataView, offSet, objArray) {
+    static wirteInnerObjectArray(dataView, offSet, objArray = []) {
         var totalLength = 0;
         var arrayLength = objArray.length;
         dataView.setUint8(offSet, arrayLength);
@@ -565,7 +565,7 @@ class Buffer {
         if (obj === undefined || obj === null) {
             return objectLength;
         }
-        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.name);
+        var byteInfoArray = Buffer.ClassInfoMap.get(obj.constructor.prototype["objkey"]); //target.constructor.prototype["objkey"];obj.constructor.name
         for (let i = 0; i < byteInfoArray.length; i++) {
             let byteInfo = byteInfoArray[i];
             let byteLength = Buffer.getPropertyByteLength(byteInfo.Type, obj[byteInfo.PropertyKey]);
@@ -687,19 +687,48 @@ Buffer.ClassMap = new Map();
  */
 Buffer.ClassInfoMap = new Map();
 exports.Buffer = Buffer;
+// /**属性修饰
+//  * ByteMember 
+//  * @param order 
+//  * @param type 
+//  */
+// export function ByteMember(order: number, type: ByteType, fun: Function = null) {
+//     return function (target: any, propertyKey: string) {
+//         var byteInfo = new ByteInfo(propertyKey, order, type, fun)
+//         var byteInfoArray = Buffer.ClassInfoMap.get(target.constructor.name);
+//         if (!byteInfoArray) {
+//             byteInfoArray = Array<ByteInfo>();
+//             byteInfoArray.push(byteInfo);
+//             Buffer.ClassInfoMap.set(target.constructor.name, byteInfoArray);
+//         } else {
+//             byteInfoArray.push(byteInfo);
+//             byteInfoArray.sort((a, b) => a.Order - b.Order)//排序
+//         }
+//     }
+// }
 /**属性修饰
  * ByteMember
  * @param order
  * @param type
  */
-function ByteMember(order, type, fun = null) {
+function ByteMember(order, type, fun = null, objkey = null) {
     return function (target, propertyKey) {
         var byteInfo = new ByteInfo(propertyKey, order, type, fun);
-        var byteInfoArray = Buffer.ClassInfoMap.get(target.constructor.name);
+        if (objkey != null) {
+            if (!target.constructor.prototype["objkey"]) {
+                target.constructor.prototype["objkey"] = objkey;
+            }
+        }
+        else {
+            objkey = target.constructor.prototype["objkey"];
+            if (objkey == undefined)
+                throw Error("没有 objKey");
+        }
+        var byteInfoArray = Buffer.ClassInfoMap.get(objkey);
         if (!byteInfoArray) {
             byteInfoArray = Array();
             byteInfoArray.push(byteInfo);
-            Buffer.ClassInfoMap.set(target.constructor.name, byteInfoArray);
+            Buffer.ClassInfoMap.set(objkey, byteInfoArray);
         }
         else {
             byteInfoArray.push(byteInfo);
@@ -708,11 +737,17 @@ function ByteMember(order, type, fun = null) {
     };
 }
 exports.ByteMember = ByteMember;
+// /**类修饰
+//  * 需要序列化的类的 标识
+//  */
+// export function BtyeContract(target: any) {
+//     Buffer.ClassMap.set(target.name, target);
+// }
 /**类修饰
  * 需要序列化的类的 标识
  */
 function BtyeContract(target) {
-    Buffer.ClassMap.set(target.name, target);
+    Buffer.ClassMap.set(target.prototype["objkey"], target);
 }
 exports.BtyeContract = BtyeContract;
 /**枚举类型
