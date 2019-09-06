@@ -55,7 +55,7 @@ class Buffer {
         var offSet = 0;
         var object = new classType.prototype.constructor(); //也可以 new (<any>classType())
         var dataView = new DataView(buffer);
-        var byteInfoArray = Buffer.ClassInfoMap.get(classType.name);
+        var byteInfoArray = Buffer.ClassInfoMap.get(classType.prototype["objkey"]);
         for (let i = 0; i < byteInfoArray.length; i++) {
             let byteInfo = byteInfoArray[i];
             let byteLength = this.readProperty(dataView, offSet, byteInfo, object, byteInfo.PropertyKey);
