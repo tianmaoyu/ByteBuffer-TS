@@ -24,7 +24,7 @@ var ClientMsgType;
 let Role = class Role {
 };
 __decorate([
-    ByteBuffer_1.ByteMember(1, ByteBuffer_1.ByteType.UInt16, null, "Role"),
+    ByteBuffer_1.ByteMember(1, ByteBuffer_1.ByteType.UInt16),
     __metadata("design:type", Number)
 ], Role.prototype, "Id", void 0);
 __decorate([
@@ -38,7 +38,7 @@ exports.Role = Role;
 let User = class User {
 };
 __decorate([
-    ByteBuffer_1.ByteMember(1, ByteBuffer_1.ByteType.UInt16, null, "User"),
+    ByteBuffer_1.ByteMember(1, ByteBuffer_1.ByteType.UInt16),
     __metadata("design:type", Number)
 ], User.prototype, "Id", void 0);
 __decorate([
@@ -60,7 +60,7 @@ let ComplexMsg = class ComplexMsg {
     }
 };
 __decorate([
-    ByteBuffer_1.ByteMember(1, ByteBuffer_1.ByteType.UInt8, null, "ComplexMsg"),
+    ByteBuffer_1.ByteMember(1, ByteBuffer_1.ByteType.UInt8),
     __metadata("design:type", Number)
 ], ComplexMsg.prototype, "MessageType", void 0);
 __decorate([
@@ -110,7 +110,7 @@ exports.ComplexMsg = ComplexMsg;
 let Number24Msg = class Number24Msg {
 };
 __decorate([
-    ByteBuffer_1.ByteMember(7, ByteBuffer_1.ByteType.Int24, null, "Number24Msg"),
+    ByteBuffer_1.ByteMember(7, ByteBuffer_1.ByteType.Int24),
     __metadata("design:type", Number)
 ], Number24Msg.prototype, "Id", void 0);
 __decorate([
@@ -132,7 +132,7 @@ exports.Number24Msg = Number24Msg;
 let NumberMsg = class NumberMsg {
 };
 __decorate([
-    ByteBuffer_1.ByteMember(1, ByteBuffer_1.ByteType.Bool, null, "NumberMsg"),
+    ByteBuffer_1.ByteMember(1, ByteBuffer_1.ByteType.Bool),
     __metadata("design:type", Boolean)
 ], NumberMsg.prototype, "Bool", void 0);
 __decorate([
@@ -178,7 +178,7 @@ exports.NumberMsg = NumberMsg;
 let StringMsg = class StringMsg {
 };
 __decorate([
-    ByteBuffer_1.ByteMember(1, ByteBuffer_1.ByteType.String, null, "StringMsg"),
+    ByteBuffer_1.ByteMember(1, ByteBuffer_1.ByteType.String),
     __metadata("design:type", String)
 ], StringMsg.prototype, "String", void 0);
 __decorate([
@@ -192,7 +192,7 @@ exports.StringMsg = StringMsg;
 let ObjectMsg = class ObjectMsg {
 };
 __decorate([
-    ByteBuffer_1.ByteMember(0, ByteBuffer_1.ByteType.Object, User, "ObjectMsg"),
+    ByteBuffer_1.ByteMember(0, ByteBuffer_1.ByteType.Object, User),
     __metadata("design:type", User)
 ], ObjectMsg.prototype, "Object", void 0);
 __decorate([

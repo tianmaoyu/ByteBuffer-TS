@@ -801,17 +801,13 @@ export class Buffer {
  * @param order 
  * @param type 
  */
-export function ByteMember(order: number, type: ByteType, fun: Function = null,objkey:string=null) {
+export function ByteMember(order: number, type: ByteType, fun: Function = null) {
     return function (target: any, propertyKey: string) {
         var byteInfo = new ByteInfo(propertyKey, order, type, fun)
-
-        if(objkey!=null){
-            if(!target.constructor.prototype["objkey"]){
-                target.constructor.prototype["objkey"]=objkey;
-            }
-        }else{
-            objkey= target.constructor.prototype["objkey"];
-            if(objkey==undefined) throw Error("没有 objKey");
+        var objkey=target.constructor.prototype["objkey"]
+        if(objkey==undefined){
+            objkey=guid();
+            target.constructor.prototype["objkey"]=objkey;
         }
 
         var byteInfoArray = Buffer.ClassInfoMap.get(objkey);
@@ -844,6 +840,15 @@ export function BtyeContract(target: any) {
 }
 
 
+/**
+ * 生成guid
+ */
+function guid() {
+    function S4() {
+       return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    }
+    return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+}
 /**枚举类型
  *Byte Type 
  */
